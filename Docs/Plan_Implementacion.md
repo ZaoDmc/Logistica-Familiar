@@ -42,7 +42,7 @@ La ubicación actual dentro de XAMPP no obliga a usar PHP ni MariaDB. Esta base 
 1. Crear una cuenta personal en [Supabase](https://supabase.com/) y un proyecto Free; elegir una región cercana disponible. Guardar la contraseña de PostgreSQL en un gestor de contraseñas.
 2. Obtener la URL del proyecto y la clave **publishable** para la web. Copiarlas a `.env.local` según `.env.example` cuando se implemente la conexión.
 3. Mantener claves secretas y `service_role` únicamente en el servidor/secretos de funciones. Nunca ponerlas en variables `VITE_*`, Git ni el chat.
-4. Aplicar las migraciones SQL versionadas que se entregarán en la fase 1 y verificar RLS antes de usar datos reales.
+4. Para aplicar SQL, preparar la conexión administrativa según [guía de fase 1](Fase_1_SQL.md). Las migraciones y su validación RLS son entregables de la fase 1, no requisitos que debas implementar previamente.
 
 **Antes de la fase 2:**
 
@@ -96,13 +96,15 @@ Los criterios deben verificarse antes de marcar una fase terminada. El porcentaj
 - [x] Arquitectura, alojamiento y requisitos de cuentas documentados.
 - [x] Base local React + TypeScript + Vite y catálogo inicial de iconos.
 - [x] Ejemplo de variables y estructura para futuras migraciones.
-- [ ] Elección final de proveedor por el usuario, antes de crear infraestructura.
+- [x] Supabase seleccionado y proyecto accesible con URL y clave publishable; Vercel se configurará al publicar.
 
 Cierre técnico verificado el 21 de octubre de 2026: dependencias instaladas, `npm run build` ejecutado con comprobación TypeScript y generación de `dist` correctas. La pantalla inicial informa que las funciones del hogar todavía no están implementadas. No se ha realizado validación visual en navegador ni pruebas en celulares; se realizarán con las funciones correspondientes.
 
-### Fase 1 — SQL y permisos (pendiente)
+### Fase 1 — SQL y permisos (completada)
 
 Entregables: migraciones, restricciones, RLS, funciones de stock e historial, datos de ejemplo de desarrollo y procedimiento de creación del hogar.
+
+Verificado el 21 de octubre de 2026: migración `202610210001` aplicada en Supabase con TLS verificado; reejecución sin cambios; 63 comprobaciones SQL correctas tanto locales como remotas. Pruebas con hasta cinco sesiones verifican incrementos simultáneos, reintentos, conflictos de versión y límites no negativos. Datos temporales eliminados. La compilación web y TypeScript también pasan. Pasos, comandos y contrato en [Fase 1 — SQL](Fase_1_SQL.md).
 
 Criterio: usuario ajeno y usuario anónimo no acceden al hogar; no es posible alterar roles ni historial desde el cliente. Dos ajustes simultáneos conservan ambos cambios; reintentos no duplican operaciones; no hay stock negativo.
 

@@ -2,10 +2,11 @@
 
 Base de una aplicación móvil web para compartir el inventario del hogar.
 
-**Estado: fase 0.** Arranque local y documentación preparados. Aún no hay login, base de datos conectada, edición de inventario ni sincronización. No se ha publicado ni creado infraestructura externa.
+**Estado: fase 1 completada.** Esquema SQL aplicado en Supabase, RLS y operaciones de stock auditadas verificadas. Pasaron 63 comprobaciones locales y remotas y las pruebas de concurrencia con hasta cinco sesiones. La web todavía no tiene login, inventario ni sincronización; el próximo paso es la fase 2 de cuentas e integrantes.
 
 - [Instrucciones base](Docs/Instrucciones_Base.md)
 - [Plan por fases y cuentas necesarias](Docs/Plan_Implementacion.md)
+- [Fase 1: aplicar SQL, probar y crear el hogar](Docs/Fase_1_SQL.md)
 
 ## Desarrollo en Windows / PowerShell
 

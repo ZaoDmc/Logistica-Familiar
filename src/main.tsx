@@ -13,9 +13,9 @@ function App() {
         <p>Un lugar compartido para saber qué queda y qué hace falta, estés donde estés.</p>
       </section>
       <section className="status" aria-labelledby="status-title">
-        <span className="badge">Fase 0 · Preparación</span>
+        <span className="badge">Fase 1 · Base SQL</span>
         <h2 id="status-title">La base de nuestro hogar</h2>
-        <p>El proyecto está preparado para comenzar. Las cuentas, el inventario y los cambios en vivo se incorporarán en las próximas fases.</p>
+        <p>El esquema y las pruebas de la base de datos están preparados. Las cuentas, el inventario y los cambios en vivo se incorporarán en las próximas fases.</p>
         <p className="note">Esta pantalla no contiene stock real ni está conectada a una base de datos.</p>
       </section>
       <section aria-labelledby="catalog-title">
