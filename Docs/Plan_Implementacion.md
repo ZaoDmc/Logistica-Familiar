@@ -118,9 +118,11 @@ Mejora de apariencia solicitada: paleta semántica centralizada y tema claro, os
 
 Criterio: admin e integrante entran con cuentas distintas. Solo admin puede añadir integrantes, incluso intentando invocar directamente la API. El alta queda asociada al hogar correcto.
 
-### Fase 3 — Inventario móvil (pendiente; depende de 1 y 2)
+### Fase 3 — Inventario móvil (completada)
 
 Entregables: categorías, creación de productos, selector de iconos, descripción breve, búsqueda/filtro, casilla numérica, +/− e historial visible. Pantallas para vacío, carga y errores.
+
+Verificado el 21 de octubre de 2026: inventario para ambos roles, reintentos con UUID conservado, historial paginado y conflicto de cantidades mediante HTTP 409. Migración `202610210003` aplicada. Pasaron 24 pruebas de modelo, 90 comprobaciones SQL locales/remotas y 21 pruebas HTTP de inventario, además de concurrencia con cinco sesiones. Interfaz verificada a 360 px, con los temas existentes. Uso y límites en [Fase 3 — Inventario](Fase_3_Inventario.md). La sincronización automática se mantiene para fase 4.
 
 Criterio: ambos roles agregan productos y categorías y cambian cantidades. Se usa cómodamente a 360 px de ancho, sin desplazamiento horizontal, con controles táctiles de al menos 44 px y etiquetas accesibles.
 
