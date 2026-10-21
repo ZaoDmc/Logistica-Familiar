@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.local
+*.log
+.vercel/
+supabase/.temp/
+supabase/.branches/
+pass.txt
