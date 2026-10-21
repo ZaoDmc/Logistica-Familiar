@@ -48,8 +48,8 @@ La ubicación actual dentro de XAMPP no obliga a usar PHP ni MariaDB. Esta base 
 
 1. Habilitar correo/contraseña en Auth y deshabilitar registro público.
 2. Configurar Site URL y URLs de redirección exactas para desarrollo y producción.
-3. Crear la primera cuenta admin por un procedimiento controlado. El rol se guarda en la pertenencia al hogar; no se acepta un rol elegido por el navegador.
-4. Para invitaciones y recuperación por correo reales, configurar SMTP externo. El envío predeterminado de Supabase tiene restricciones y no debe asumirse listo para enviar a familiares. Elegir proveedor y verificar su costo y requisitos de dominio en esta fase. Si se posponen correos, documentar un alta manual segura y recuperación manual; no simular invitaciones enviadas.
+3. Crear la primera cuenta admin por un procedimiento controlado. El rol se guarda en la pertenencia al hogar; no se acepta un rol elegido por el navegador. Completado en fase 2.
+4. Para invitaciones y recuperación por correo reales, configurar SMTP externo. El envío predeterminado de Supabase tiene restricciones y no debe asumirse listo para enviar a familiares. En fase 2 se implementaron enlaces privados compartidos manualmente para alta y recuperación; SMTP queda pospuesto y no se simula ningún correo enviado.
 
 **Antes de las fases 4 y 5:**
 
@@ -108,9 +108,13 @@ Verificado el 21 de octubre de 2026: migración `202610210001` aplicada en Supab
 
 Criterio: usuario ajeno y usuario anónimo no acceden al hogar; no es posible alterar roles ni historial desde el cliente. Dos ajustes simultáneos conservan ambos cambios; reintentos no duplican operaciones; no hay stock negativo.
 
-### Fase 2 — Cuentas e integrantes (pendiente; depende de 1)
+### Fase 2 — Cuentas e integrantes (completada)
 
 Entregables: login, logout, sesión, recuperación y panel del admin para añadir integrantes; alta autorizada mediante función de servidor. La función comprueba identidad y rol antes de usar privilegios de Auth. Definir expiración, reintentos y revocación de invitaciones.
+
+Verificado el 21 de octubre de 2026: migración `202610210002` aplicada y función Edge `household-admin` activa. Primera cuenta admin y hogar creados. Registro público cerrado; alta y recuperación por enlaces compartidos manualmente, sin SMTP. Pruebas SQL locales/remotas: 90 correctas; Auth/HTTP reales: 37 correctas, además de las pruebas de concurrencia. Acceso admin y sesión verificados en navegador. Detalles en [Fase 2 — Cuentas](Fase_2_Cuentas.md).
+
+Mejora de apariencia solicitada: paleta semántica centralizada y tema claro, oscuro o automático con preferencia persistente. Comprobado a 360 px y escritorio; las pruebas en celulares físicos y publicación siguen en fase 5.
 
 Criterio: admin e integrante entran con cuentas distintas. Solo admin puede añadir integrantes, incluso intentando invocar directamente la API. El alta queda asociada al hogar correcto.
 

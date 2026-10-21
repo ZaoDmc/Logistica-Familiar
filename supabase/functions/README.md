@@ -1,3 +1,5 @@
-# Funciones pendientes
+# Funciones de servidor
 
-La fase 2 incorporará la operación administrativa para dar de alta integrantes, con verificación de sesión y rol. Las credenciales privilegiadas permanecerán en los secretos del servidor. No hay funciones desplegadas en esta etapa.
+`household-admin` está desplegada en Supabase. Gestiona invitaciones privadas, aceptación y recuperación manual de acceso. Las acciones admin validan el JWT y la pertenencia al hogar antes de usar privilegios de servidor.
+
+El handler compartido está en `_shared/household-handler.mjs`; el punto de entrada Deno está en `household-admin/index.ts`. Desplegar con `npm run auth:deploy`; guía completa en `Docs/Fase_2_Cuentas.md`.

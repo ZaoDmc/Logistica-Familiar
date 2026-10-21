@@ -4,8 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#225c49" />
+    <meta name="referrer" content="no-referrer" />
     <meta name="description" content="Inventario compartido para organizar los artículos de tu hogar." />
     <title>Logística Familiar</title>
+    <script>
+      try {
+        const theme = localStorage.getItem('lf.theme');
+        document.documentElement.dataset.theme = theme === 'light' || theme === 'dark' ? theme : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

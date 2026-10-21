@@ -2,11 +2,12 @@
 
 Base de una aplicación móvil web para compartir el inventario del hogar.
 
-**Estado: fase 1 completada.** Esquema SQL aplicado en Supabase, RLS y operaciones de stock auditadas verificadas. Pasaron 63 comprobaciones locales y remotas y las pruebas de concurrencia con hasta cinco sesiones. La web todavía no tiene login, inventario ni sincronización; el próximo paso es la fase 2 de cuentas e integrantes.
+**Estado: fase 2 completada.** Login, sesión, cambio/recuperación de contraseña y administración de integrantes funcionan con Supabase. Tu cuenta admin y el primer hogar están creados. Hay tema claro, oscuro y automático. El inventario móvil se implementará en fase 3.
 
 - [Instrucciones base](Docs/Instrucciones_Base.md)
 - [Plan por fases y cuentas necesarias](Docs/Plan_Implementacion.md)
 - [Fase 1: aplicar SQL, probar y crear el hogar](Docs/Fase_1_SQL.md)
+- [Fase 2: uso de cuentas, invitaciones y apariencia](Docs/Fase_2_Cuentas.md)
 
 ## Desarrollo en Windows / PowerShell
 
@@ -31,18 +32,18 @@ Para una prueba en un celular conectado a la misma red:
 npm.cmd run dev -- --host 0.0.0.0
 ```
 
-Usar la URL de red que muestre Vite y, si Windows lo solicita, permitir el acceso solamente en la red privada. Esto sirve para desarrollo y no publica la app en Internet. La instalación PWA sobre HTTPS se implementará después.
+Usar la URL de red que muestre Vite para revisar el diseño. Las funciones de administración solo admiten los orígenes configurados; los enlaces localhost no sirven desde otro celular. El acceso compartido permanente y la instalación PWA sobre HTTPS se implementarán en fase 5.
 
-## Configuración futura
+## Configuración
 
-Copiar `.env.example` a `.env.local` y completar los valores al implementar Supabase. La pantalla inicial funciona sin ellos y todavía no los consume. Nunca poner claves secretas o `service_role` en variables `VITE_*`: se incluyen en el código público del navegador.
+La web ya utiliza las variables de Supabase en `.env` (también se admite `.env.local`). Usar `.env.example` como referencia en una instalación nueva. Nunca poner claves secretas o `service_role` en variables `VITE_*`: se incluyen en el código público del navegador. Los archivos administrativos privados y los comandos de configuración están documentados en la guía de fase 2.
 
 ## Estructura
 
 - `Docs/`: requisitos, decisiones y avance.
-- `src/`: pantalla inicial, estilos y catálogo de iconos.
-- `supabase/migrations/`: futuras migraciones SQL versionadas.
-- `supabase/functions/`: futuras operaciones administrativas de servidor.
+- `src/`: acceso, administración del hogar, temas y catálogo de iconos.
+- `supabase/migrations/`: migraciones SQL versionadas de inventario y cuentas.
+- `supabase/functions/`: operaciones administrativas de servidor.
 - `dist/`: resultado generado por el build, no versionado.
 
 Usar el archivo `package-lock.json` para instalaciones reproducibles. El repositorio Git remoto y los servicios se configurarán en la fase de publicación.

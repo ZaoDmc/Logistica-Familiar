@@ -107,6 +107,6 @@ Agrega categorías y estos productos: Crema de leche Soprole (2), Comida del Log
 - Pruebas remotas: las mismas 63 comprobaciones correctas usando los roles SQL y `auth.uid()` reales de Supabase. Las identidades de prueba se simulan desde la conexión administrativa; el login y la validación de sesiones de la interfaz se implementan y prueban en fase 2.
 - Concurrencia: hasta cinco sesiones; incrementos sin pérdidas, reintentos sin duplicados, detección de versión obsoleta y decrementos sin negativos. Historial y versiones consistentes.
 - Limpieza: transacción de permisos revertida y datos de concurrencia eliminados.
-- Primer hogar real: pendiente; no bloquea crear y probar el esquema.
+- Primer hogar real: creado posteriormente durante la fase 2 junto con la primera cuenta admin.
 
-**Fase 1 completada.** Las cuentas reales, el primer hogar familiar y la interfaz de acceso se incorporan en fase 2.
+**Fase 1 completada.** Las cuentas reales, el primer hogar familiar y la interfaz de acceso se incorporaron en fase 2. Ver [guía de cuentas](Fase_2_Cuentas.md).
