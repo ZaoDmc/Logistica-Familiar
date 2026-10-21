@@ -11,12 +11,17 @@
     "test:db": "node scripts/test-database-local.mjs",
     "db:migrate": "node scripts/migrate-database.mjs",
     "test:db:remote": "node scripts/test-database-remote.mjs",
-    "db:seed": "node scripts/seed-demo.mjs"
+    "db:seed": "node scripts/seed-demo.mjs",
+    "auth:deploy": "node scripts/deploy-accounts.mjs",
+    "auth:bootstrap": "node scripts/bootstrap-admin.mjs",
+    "auth:recover-admin": "node scripts/recover-admin.mjs",
+    "test:accounts:remote": "node scripts/test-accounts-remote.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

@@ -1,6 +1,7 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
 import { runDatabaseTests } from './db-test-suite.mjs';
+import { runAccountDatabaseTests } from './db-accounts-suite.mjs';
 
 const db = new PGlite();
 try {
@@ -17,8 +18,10 @@ try {
     grant usage on schema public, auth to authenticated, anon;
     grant execute on function auth.uid() to authenticated, anon;
   `);
-  await db.exec(readFileSync(new URL('../supabase/migrations/202610210001_household_inventory.sql', import.meta.url), 'utf8'));
+  const directory = new URL('../supabase/migrations/', import.meta.url);
+  for (const file of readdirSync(directory).filter(name => /^\d+_.+\.sql$/.test(name)).sort()) await db.exec(readFileSync(new URL(file, directory), 'utf8'));
   await runDatabaseTests((sql, params) => db.query(sql, params));
+  await runAccountDatabaseTests((sql, params) => db.query(sql, params));
 } finally {
   await db.close();
 }

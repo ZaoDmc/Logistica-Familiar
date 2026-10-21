@@ -1,0 +1,4 @@
+[functions.household-admin]
+# El endpoint de aceptación usa un enlace secreto. Las acciones de admin validan
+# el JWT mediante auth.getUser antes de ejecutar RPC privilegiadas.
+verify_jwt = false

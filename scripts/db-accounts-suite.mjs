@@ -1,0 +1,75 @@
+import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
+export async function runAccountDatabaseTests(query) {
+  const admin = randomUUID(), member = randomUUID(), invitee = randomUUID();
+  const home = randomUUID(), foreignHome = randomUUID(), invitation = randomUUID();
+  const hash1 = 'a'.repeat(64), hash2 = 'b'.repeat(64), hash3 = 'c'.repeat(64);
+  const inviteEmail = `${invitee}@example.invalid`;
+  let passed = 0;
+  const check = (condition, message) => { assert.ok(condition, message); passed++; };
+  const one = async (sql, args = []) => (await query(sql, args)).rows[0];
+  const role = async name => { await query('reset role'); await query(`set local role ${name}`); };
+  const fails = async (sql, args, code, message) => {
+    await query('savepoint expected_failure'); let actual;
+    try { await query(sql, args); } catch (error) { actual = error.code; }
+    await query('rollback to savepoint expected_failure'); await query('release savepoint expected_failure');
+    check(actual === code, `${message}: esperado ${code}, recibido ${actual || 'sin error'}`);
+  };
+  const manage = 'select * from public.manage_household_invitation($1,$2,$3,$4,$5,$6,$7)';
+  const params = [admin, home, 'create', invitation, inviteEmail.toUpperCase(), 'Invitado', hash1];
+  await query('begin');
+  try {
+    for (const id of [admin, member, invitee]) await query('insert into auth.users(id,email) values ($1,$2)', [id, `${id}@example.invalid`]);
+    for (const [id, name] of [[admin, 'Admin'], [member, 'Integrante']]) await query('insert into public.profiles(id,display_name) values ($1,$2)', [id, name]);
+    await query("insert into public.households(id,name) values ($1,'Prueba de cuentas'),($2,'Hogar ajeno')", [home, foreignHome]);
+    await query("insert into public.household_members(household_id,user_id,role) values ($1,$2,'admin'),($1,$3,'integrante'),($4,$3,'admin')", [home, admin, member, foreignHome]);
+    await role('service_role');
+    const created = await one(manage, params);
+    check(created.email === inviteEmail && created.status === 'pending', 'Correo normalizado e invitación pendiente');
+    check(new Date(created.expires_at) > new Date(), 'Tiene vencimiento futuro');
+    await fails(manage, [member, home, 'create', randomUUID(), 'bad@example.invalid', 'Ajeno', hash2], '42501', 'Integrante no crea invitaciones');
+    await fails(manage, [admin, foreignHome, 'create', randomUUID(), 'bad@example.invalid', 'Ajeno', hash2], '42501', 'Admin no crea en otro hogar');
+    await fails(manage, [admin, home, 'create', randomUUID(), `${member}@example.invalid`, 'Ya miembro', hash2], '22023', 'No invita miembro existente');
+    await fails(manage, [admin, home, 'create', randomUUID(), inviteEmail, 'Duplicado', hash2], '23505', 'Una invitación pendiente por correo y hogar');
+    await fails(manage, [admin, home, 'create', invitation, 'distinto@example.invalid', 'Invitado', hash2], '42501', 'Reintento no altera destinatario');
+    await fails(manage, [admin, home, 'create', randomUUID(), 'bad@example.invalid', 'Nombre', 'invalido'], '22023', 'Rechaza hashes inválidos');
+    const retry = await one(manage, [...params.slice(0, 6), hash2]);
+    check(retry.id === invitation && retry.token_hash === hash2, 'Reintento conserva invitación y rota enlace');
+    await fails('select public.inspect_household_invitation($1)', [hash1], '22023', 'Enlace anterior deja de funcionar');
+    const inspected = await one('select public.inspect_household_invitation($1) as invitation', [hash2]);
+    check(inspected.invitation.email === inviteEmail && !('token_hash' in inspected.invitation), 'Inspección devuelve solo datos de aceptación');
+    await fails('select public.accept_household_invitation($1,$2)', [hash2, member], '42501', 'Correo de aceptación debe coincidir');
+    await role('authenticated');
+    await query("select set_config('request.jwt.claim.sub',$1,true)", [admin]);
+    await fails(manage, params, '42501', 'Admin del navegador no invoca RPC privilegiada');
+    await fails('select token_hash from public.household_invitations', [], '42501', 'Hash no se expone ni a admin');
+    check((await one('select count(*)::integer as count from public.household_invitations')).count === 1, 'Admin puede consultar invitaciones seguras');
+    await fails('select public.accept_household_invitation($1,$2)', [hash2, invitee], '42501', 'Cliente no suplanta identidad en aceptación');
+    await role('anon');
+    await fails('select public.inspect_household_invitation($1)', [hash2], '42501', 'Anónimo no llama RPC interna');
+    await role('service_role');
+    check((await one('select public.accept_household_invitation($1,$2) as home', [hash2, invitee])).home === home, 'Aceptación crea pertenencia');
+    check((await one('select public.accept_household_invitation($1,$2) as home', [hash2, invitee])).home === home, 'Aceptación SQL idempotente');
+    await query('reset role');
+    check((await one('select role from public.household_members where household_id=$1 and user_id=$2', [home, invitee])).role === 'integrante', 'Rol nuevo siempre integrante');
+    check((await one('select display_name from public.profiles where id=$1', [invitee])).display_name === 'Invitado', 'Perfil creado al aceptar');
+    await role('service_role');
+    await fails('select public.inspect_household_invitation($1)', [hash2], '22023', 'Enlace consumido no vuelve a ofrecer alta');
+    const secondId = randomUUID();
+    await query(manage, [admin, home, 'create', secondId, 'second@example.invalid', 'Segunda', hash3]);
+    await query(manage, [admin, home, 'revoke', secondId, null, null, null]);
+    await fails('select public.inspect_household_invitation($1)', [hash3], '22023', 'Revocación invalida enlace');
+    await fails(manage, [admin, home, 'renew', secondId, null, null, hash3], '22023', 'No revive invitación revocada');
+    const thirdId = randomUUID();
+    await query(manage, [admin, home, 'create', thirdId, 'third@example.invalid', 'Tercera', hash3]);
+    await query('reset role');
+    await query("update public.household_invitations set created_at=now()-interval '8 days',expires_at=now()-interval '1 day' where id=$1", [thirdId]);
+    await role('service_role');
+    await fails('select public.inspect_household_invitation($1)', [hash3], '22023', 'Invitación vencida no se inspecciona');
+    await fails('select public.accept_household_invitation($1,$2)', [hash3, invitee], '22023', 'Invitación vencida no se acepta');
+    const renewed = await one(manage, [admin, home, 'renew', thirdId, null, null, hash1]);
+    check(renewed.token_hash === hash1 && new Date(renewed.expires_at) > new Date(), 'Renovación permite reemplazar enlace vencido');
+    console.log(`Cuentas SQL: ${passed} comprobaciones correctas; datos revertidos.`);
+    return passed;
+  } finally { await query('rollback'); }
+}
