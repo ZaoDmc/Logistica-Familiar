@@ -15,7 +15,10 @@
     "auth:deploy": "node scripts/deploy-accounts.mjs",
     "auth:bootstrap": "node scripts/bootstrap-admin.mjs",
     "auth:recover-admin": "node scripts/recover-admin.mjs",
-    "test:accounts:remote": "node scripts/test-accounts-remote.mjs"
+    "test:accounts:remote": "node scripts/test-accounts-remote.mjs",
+    "test:inventory": "node --experimental-strip-types scripts/test-inventory-model.mjs",
+    "inventory:qa": "node scripts/inventory-qa.mjs",
+    "test:inventory:remote": "node scripts/test-inventory-remote.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
