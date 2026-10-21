@@ -80,7 +80,7 @@ Las siguientes pantallas deben usar estas variables. Los errores y el foco del t
 - Se deshabilitó el registro público de Supabase Auth. Correo/contraseña están habilitados.
 - Los orígenes y redirecciones actuales son `http://localhost:5173` y `http://127.0.0.1:5173`. No se permite cualquier origen desde el navegador.
 - Los enlaces de recuperación se generan con la API admin `generateLink`, que no envía correo.
-- No se incorporaron operaciones de inventario a la interfaz: corresponden a fase 3.
+- Al cerrar la fase 2, las operaciones de inventario estaban pendientes de la fase 3. Ya se incorporaron; ver [guía de inventario](Fase_3_Inventario.md).
 
 Referencias oficiales: [contraseñas](https://supabase.com/docs/guides/auth/passwords), [creación administrativa de usuarios](https://supabase.com/docs/reference/javascript/auth-admin-createuser), [generar enlaces](https://supabase.com/docs/reference/javascript/auth-admin-generatelink), [configuración de funciones](https://supabase.com/docs/guides/functions/function-configuration).
 

@@ -53,7 +53,7 @@ export async function runConcurrencyTests(pool) {
     let state = await current();
     const races = await Promise.allSettled([change(randomUUID(), 'set', 1, state.version), change(randomUUID(), 'set', 2, state.version)]);
     assert.equal(races.filter(result => result.status === 'fulfilled').length, 1, 'Una escritura absoluta gana');
-    assert.ok(races.some(result => result.status === 'rejected' && result.reason.code === '40001'), 'La otra detecta versión obsoleta');
+    assert.ok(races.some(result => result.status === 'rejected' && result.reason.code === 'PT409'), 'La otra detecta versión obsoleta');
     state = await current();
     await change(randomUUID(), 'set', 1, state.version);
     const decrements = await Promise.allSettled([change(randomUUID(), 'delta', -1), change(randomUUID(), 'delta', -1)]);

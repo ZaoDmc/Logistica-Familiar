@@ -75,7 +75,7 @@ export async function runDatabaseTests(query) {
     await fails('select public.change_stock($1,$2,$3,$4)', [product, randomUUID(), 'delta', -4], '23514', 'No permite stock negativo');
     check(await scalar('select stock from public.products where id=$1', [product]) === 3, 'Error conserva stock');
     check(await scalar('select count(*)::integer from public.stock_movements where product_id=$1', [product]) === 2, 'Error no genera historial');
-    await fails('select public.change_stock($1,$2,$3,$4,$5)', [product, randomUUID(), 'set', 8, 1], '40001', 'Detecta versión antigua en casilla');
+    await fails('select public.change_stock($1,$2,$3,$4,$5)', [product, randomUUID(), 'set', 8, 1], 'PT409', 'Detecta versión antigua en casilla');
     const absolute = (await adjust(product, randomUUID(), 'set', 8, 2)).rows[0];
     check(absolute.new_stock === 8 && Number(absolute.product_version) === 3, 'Cambio absoluto con versión vigente');
     check((await adjust(product, absolute.operation_id, 'set', 8, 2)).rows[0].id === absolute.id, 'Reintento absoluto se reconoce antes de validar versión');
