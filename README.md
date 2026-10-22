@@ -2,7 +2,7 @@
 
 Base de una aplicación móvil web para compartir el inventario del hogar.
 
-**Estado: fase 4 implementada.** Cuentas, integrantes e inventario funcionan con Supabase. Ambos roles pueden crear categorías/productos y actualizar stock con historial. Los cambios se reciben automáticamente y se recuperan al reconectar o volver a la aplicación. Incluye búsqueda, filtro por comprar y temas claro/oscuro. Publicación HTTPS, PWA y pruebas físicas en celulares corresponden a fase 5.
+**Estado: fase 5 implementada y publicada; pruebas físicas en celulares pendientes.** Abre **https://logistica-familiar.vercel.app**. La web usa Supabase para cuentas, inventario, historial y sincronización; permite instalación desde el navegador y conserva los temas claro/oscuro. Funciona sin mantener encendido el PC. El despliegue actual es directo; la publicación automática desde GitHub sigue pendiente de conectar el repositorio al proyecto existente.
 
 - [Instrucciones base](Docs/Instrucciones_Base.md)
 - [Plan por fases y cuentas necesarias](Docs/Plan_Implementacion.md)
@@ -10,6 +10,7 @@ Base de una aplicación móvil web para compartir el inventario del hogar.
 - [Fase 2: uso de cuentas, invitaciones y apariencia](Docs/Fase_2_Cuentas.md)
 - [Fase 3: inventario, cantidades, historial y pruebas](Docs/Fase_3_Inventario.md)
 - [Fase 4: sincronización, recuperación y pruebas](Docs/Fase_4_Sincronizacion.md)
+- [Fase 5: instalar, publicar, actualizar y probar en celulares](Docs/Fase_5_PWA_Publicacion.md)
 
 ## Desarrollo en Windows / PowerShell
 
@@ -48,4 +49,4 @@ La web ya utiliza las variables de Supabase en `.env` (también se admite `.env.
 - `supabase/functions/`: operaciones administrativas de servidor.
 - `dist/`: resultado generado por el build, no versionado.
 
-Usar el archivo `package-lock.json` para instalaciones reproducibles. El repositorio Git remoto y los servicios se configurarán en la fase de publicación.
+Usar el archivo `package-lock.json` para instalaciones reproducibles. Vercel publica la web y Supabase administra los datos. El procedimiento de despliegue y la futura conexión automática con GitHub están en la guía de fase 5.

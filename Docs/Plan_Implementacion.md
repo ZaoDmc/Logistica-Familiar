@@ -134,9 +134,11 @@ Implementado el 21 de octubre de 2026: migración `202610210004` aplicada, canal
 
 Criterio: cambio visible en otro celular sin recarga (objetivo de prueba: hasta 2 segundos con conexión estable, no SLA). Probar cinco sesiones, cambios simultáneos, pérdida de conexión y retorno desde segundo plano; reconciliar con la base al reconectar.
 
-### Fase 5 — PWA y publicación (pendiente; depende de 4)
+### Fase 5 — PWA y publicación (implementada y publicada; validación física pendiente)
 
 Entregables: manifest, iconos instalables, estrategia de actualización/caché y despliegue HTTPS. Evitar almacenar respuestas privadas de Auth/API en caché compartida. La PWA será instalable; eso no significa que pueda escribir stock offline.
+
+Publicado el 22 de octubre de 2026 en **https://logistica-familiar.vercel.app**, Vercel Hobby. Supabase permite ese origen para Auth y administración. Pasan build/TypeScript, 41 comprobaciones PWA y 40 HTTPS; dos publicaciones verifican el aviso de actualización en dos pestañas y la conservación de una edición. Un preview apagado verifica el fallback offline real. La instalación, datos móviles, cortes y suspensión en los dos celulares siguen pendientes; el checklist está en [Fase 5 — PWA y publicación](Fase_5_PWA_Publicacion.md). El despliegue actual es directo desde el artefacto probado. La configuración de build y variables públicas está preparada para GitHub; la conexión efectiva del repositorio y la prueba de publicación automática quedan pendientes, después de integrar los PR de fases 3, 4 y 5.
 
 Criterio: abrir URL desde datos móviles fuera de casa; probar añadir a pantalla de inicio en los celulares reales y volver a iniciar sesión. No hay claves privilegiadas en el bundle. Una actualización publicada llega a ambos dispositivos.
 
