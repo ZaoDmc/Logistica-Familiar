@@ -1,5 +1,7 @@
 # Fase 3 — Inventario móvil
 
+Esta guía describe la entrega de fase 3. La sincronización manual que se menciona aquí fue ampliada en [Fase 4 — Sincronización](Fase_4_Sincronizacion.md).
+
 Estado: completada el 21 de octubre de 2026. Rama de entrega: `feat/inventario-movil`.
 
 ## Qué puedes hacer

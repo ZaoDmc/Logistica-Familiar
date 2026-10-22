@@ -126,9 +126,11 @@ Verificado el 21 de octubre de 2026: inventario para ambos roles, reintentos con
 
 Criterio: ambos roles agregan productos y categorías y cambian cantidades. Se usa cómodamente a 360 px de ancho, sin desplazamiento horizontal, con controles táctiles de al menos 44 px y etiquetas accesibles.
 
-### Fase 4 — Sincronización (pendiente; depende de 3)
+### Fase 4 — Sincronización (implementada; validación física pendiente en fase 5)
 
 Entregables: suscripciones autorizadas, indicador de conexión, recuperación al volver a la aplicación y actualización del historial. Desactivar edición sin conexión. Liberar suscripciones al salir.
+
+Implementado el 21 de octubre de 2026: migración `202610210004` aplicada, canales por hogar con RLS, reconciliación al conectar/volver, recuperación ante errores y consulta adicional cada 30 segundos visibles. Pasan 21 pruebas de sincronización/ciclo simulado, 10 comprobaciones Realtime con cinco sesiones, 90 SQL locales/remotas y 24 de inventario. Muestras de escritura, aviso y lectura de 511–1.580 ms. Navegador a 360 px verifica actualización automática, edición preservada e historial. Cortes físicos de red y suspensión en ambos celulares se validarán con HTTPS en fase 5. Detalles en [Fase 4 — Sincronización](Fase_4_Sincronizacion.md).
 
 Criterio: cambio visible en otro celular sin recarga (objetivo de prueba: hasta 2 segundos con conexión estable, no SLA). Probar cinco sesiones, cambios simultáneos, pérdida de conexión y retorno desde segundo plano; reconciliar con la base al reconectar.
 
