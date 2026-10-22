@@ -33,10 +33,12 @@ export function PwaControls() {
     const changed = () => { if (active && controlled) setUpdate(true); controlled = true; };
     navigator.serviceWorker.addEventListener('controllerchange', changed);
     document.addEventListener('visibilitychange', check); addEventListener('online', check);
+    const interval = setInterval(check, 60000);
     return () => {
       active = false; reg?.removeEventListener('updatefound', found); worker?.removeEventListener('statechange', ready);
       navigator.serviceWorker.removeEventListener('controllerchange', changed);
       document.removeEventListener('visibilitychange', check); removeEventListener('online', check);
+      clearInterval(interval);
     };
   }, []);
   async function install() {
