@@ -8,9 +8,11 @@ export function MovementHistory({ home, products, product, setProduct, revision,
   const [rows, setRows] = useState<Movement[]>([]), [more, setMore] = useState(false);
   const [loading, setLoading] = useState(false), [error, setError] = useState('');
   const sequence = useRef(0), lock = useRef(false);
+  const selection = useRef('');
   useEffect(() => {
     if (!visible) return;
-    const current = ++sequence.current; setLoading(true); setError(''); setRows([]); setMore(false);
+    const current = ++sequence.current; setLoading(true); setError('');
+    if (selection.current !== `${home}:${product}`) { setRows([]); setMore(false); selection.current = `${home}:${product}`; }
     void getMovements(home, product).then(data => { if (current === sequence.current) { setRows(data.rows); setMore(data.more); } })
       .catch(() => { if (current === sequence.current) setError('No pudimos cargar los movimientos. Actualiza para reintentar.'); })
       .finally(() => { if (current === sequence.current) setLoading(false); });

@@ -2,13 +2,14 @@
 
 Base de una aplicación móvil web para compartir el inventario del hogar.
 
-**Estado: fase 3 completada.** Cuentas, integrantes e inventario funcionan con Supabase. Ambos roles pueden crear categorías/productos y actualizar stock con historial. Incluye búsqueda, filtro por comprar y temas claro/oscuro. Los últimos cambios del hogar se consultan con **Actualizar**; la sincronización automática corresponde a fase 4.
+**Estado: fase 4 implementada.** Cuentas, integrantes e inventario funcionan con Supabase. Ambos roles pueden crear categorías/productos y actualizar stock con historial. Los cambios se reciben automáticamente y se recuperan al reconectar o volver a la aplicación. Incluye búsqueda, filtro por comprar y temas claro/oscuro. Publicación HTTPS, PWA y pruebas físicas en celulares corresponden a fase 5.
 
 - [Instrucciones base](Docs/Instrucciones_Base.md)
 - [Plan por fases y cuentas necesarias](Docs/Plan_Implementacion.md)
 - [Fase 1: aplicar SQL, probar y crear el hogar](Docs/Fase_1_SQL.md)
 - [Fase 2: uso de cuentas, invitaciones y apariencia](Docs/Fase_2_Cuentas.md)
 - [Fase 3: inventario, cantidades, historial y pruebas](Docs/Fase_3_Inventario.md)
+- [Fase 4: sincronización, recuperación y pruebas](Docs/Fase_4_Sincronizacion.md)
 
 ## Desarrollo en Windows / PowerShell
 

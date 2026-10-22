@@ -18,7 +18,9 @@
     "test:accounts:remote": "node scripts/test-accounts-remote.mjs",
     "test:inventory": "node --experimental-strip-types scripts/test-inventory-model.mjs",
     "inventory:qa": "node scripts/inventory-qa.mjs",
-    "test:inventory:remote": "node scripts/test-inventory-remote.mjs"
+    "test:inventory:remote": "node scripts/test-inventory-remote.mjs",
+    "test:sync": "node --experimental-strip-types scripts/test-inventory-sync.mjs",
+    "test:sync:remote": "node --experimental-strip-types scripts/test-realtime-remote.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

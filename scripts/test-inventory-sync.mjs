@@ -1,0 +1,46 @@
+import assert from 'node:assert/strict';
+import { serialRefresh, watchInventory } from '../src/lib/inventory-sync.ts';
+import { inventoryLifecycle } from '../src/lib/inventory-lifecycle.ts';
+let reads = 0, release;
+const reader = serialRefresh(async () => { reads++; if (reads === 1) await new Promise(resolve => { release = resolve; }); });
+const first = reader.run();
+reader.run(); reader.run(); reader.run();
+assert.equal(reads, 1, 'Una lectura a la vez');
+release(); await first;
+assert.equal(reads, 2, 'Eventos durante una lectura producen una reconciliación adicional');
+await reader.run(); assert.equal(reads, 3, 'Permite actualizar tras finalizar');
+reader.stop(); await reader.run(); assert.equal(reads, 3, 'No inicia consultas después de desmontar');
+let finish, count = 0;
+const stopping = serialRefresh(async () => { count++; await new Promise(resolve => { finish = resolve; }); });
+const pending = stopping.run(); stopping.run(); stopping.stop(); finish(); await pending;
+assert.equal(count, 1, 'Desmontar cancela la lectura pendiente en cola');
+const callbacks = [], statuses = []; let changed = 0, removed = 0, subscribed;
+const channel = { on(type, filter, callback) { callbacks.push({type,filter,callback}); return this; }, subscribe(callback) { subscribed = callback; return this; } };
+const stop = watchInventory({channel: () => channel, removeChannel: async () => { removed++; }}, 'home-test', () => changed++, value => statuses.push(value));
+assert.equal(callbacks.filter(item => item.type === 'postgres_changes').length, 4, 'Altas de tres tablas y cambios de productos');
+assert.ok(callbacks.filter(item => item.type === 'postgres_changes').every(item => item.filter.filter === 'household_id=eq.home-test'), 'Filtro por hogar');
+subscribed('SUBSCRIBED'); assert.equal(changed, 1, 'Reconciliar al conectar incluso sin eventos nuevos');
+subscribed('CHANNEL_ERROR'); assert.equal(statuses.at(-1), 'recovering', 'Error visible en la conexión');
+callbacks.find(item => item.type === 'system').callback({status:'error'});
+assert.equal(changed, 2, 'Error del sistema provoca reconsulta');
+stop(); callbacks[0].callback({}); subscribed('SUBSCRIBED');
+assert.equal(changed, 2, 'Ignorar eventos que llegan después de liberar la suscripción');
+assert.equal(removed, 1, 'Liberar el canal');
+const surface = new EventTarget(), doc = Object.assign(new EventTarget(), {visibilityState:'visible'});
+let connects = 0, disconnects = 0, polls = 0, tick, online = true, now = 0, cleared = false;
+const dispose = inventoryLifecycle({reconnect: () => connects++, disconnect: () => disconnects++, poll: () => polls++}, {
+  window:surface, document:doc, online: () => online, now: () => now,
+  interval: callback => { tick = callback; return () => { cleared = true; }; },
+});
+online = false; surface.dispatchEvent(new Event('offline')); tick();
+assert.equal(disconnects, 1, 'Corte de red comunicado'); assert.equal(polls, 0, 'No consultar estando offline');
+online = true; surface.dispatchEvent(new Event('online')); assert.equal(connects, 1, 'Reconciliar al recuperar red');
+doc.visibilityState = 'hidden'; doc.dispatchEvent(new Event('visibilitychange')); tick();
+assert.equal(connects, 1, 'No reconectar al ocultarse'); assert.equal(polls, 0, 'No sondear en segundo plano');
+doc.visibilityState = 'visible'; doc.dispatchEvent(new Event('visibilitychange')); surface.dispatchEvent(new Event('focus'));
+assert.equal(connects, 2, 'Retorno y foco juntos producen una recuperación');
+now = 1000; surface.dispatchEvent(new Event('pageshow')); assert.equal(connects, 3, 'Restauración de página recupera datos');
+tick(); assert.equal(polls, 1, 'Sondeo visible con conexión');
+dispose(); surface.dispatchEvent(new Event('online')); doc.dispatchEvent(new Event('visibilitychange'));
+assert.ok(cleared && connects === 3, 'Salir elimina listeners y sondeo');
+console.log('Sincronización: 21 comprobaciones del coordinador, suscripciones y ciclo de conexión correctas.');
