@@ -25,7 +25,8 @@
     "web:deploy": "node scripts/deploy-web.mjs",
     "web:status": "node scripts/deploy-web.mjs status",
     "web:configure": "node scripts/configure-production.mjs",
-    "test:web:remote": "node scripts/test-web-remote.mjs"
+    "test:web:remote": "node scripts/test-web-remote.mjs",
+    "web:prepare-git": "node scripts/configure-vercel-build.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

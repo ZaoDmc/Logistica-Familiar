@@ -14,7 +14,11 @@ async function visit(directory, prefix='') {
     const response = await fetch(origin + path,{cache:'no-store',signal:AbortSignal.timeout(20000)});
     check(response.status === 200,`${path}: HTTP 200`);
     check(digest(Buffer.from(await response.arrayBuffer())) === digest(readFileSync(`${directory}/${entry.name}`)),`${path}: idéntico al artefacto validado`);
-    if (path === '/index.html') check(response.headers.get('cache-control')?.includes('no-store'),'HTML no se conserva en caché HTTP');
+    if (path === '/index.html') {
+      check(response.headers.get('cache-control')?.includes('no-store'),'HTML no se conserva en caché HTTP');
+      check(response.headers.get('x-content-type-options') === 'nosniff','Tipos de contenido sin sniffing');
+      check(response.headers.get('x-frame-options') === 'DENY','La aplicación no se abre dentro de marcos ajenos');
+    }
     if (path === '/sw.js') check(response.headers.get('cache-control')?.includes('no-cache'),'Trabajador revisa actualizaciones');
     if (path.startsWith('/assets/')) check(response.headers.get('cache-control')?.includes('immutable'),'Assets versionados inmutables');
     check(response.headers.get('referrer-policy') === 'no-referrer',`${path}: enlaces de invitación sin Referer`);
