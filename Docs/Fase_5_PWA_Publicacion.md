@@ -102,7 +102,7 @@ npm.cmd run web:configure -- https://logistica-familiar.vercel.app
 npm.cmd run web:prepare-git
 ```
 
-El despliegue estático directo utiliza ajustes propios de ese despliegue. Después de volver a publicar así, `web:prepare-git` deja de nuevo los ajustes del proyecto preparados para un futuro build desde fuentes. No activa por sí mismo la conexión con GitHub.
+El despliegue estático directo incluye un `vercel.json` propio con instalación y compilación desactivadas y salida en el directorio raíz del artefacto. Es necesario porque los ajustes `npm ci` / `dist` del proyecto para Git no corresponden a unos archivos ya compilados. El `vercel.json` versionado en el repositorio conserva la configuración Vite para fuentes. `web:prepare-git` permite reconstruir los ajustes del proyecto para un futuro build desde Git; no activa por sí mismo la conexión con GitHub.
 
 Referencias: [despliegues por API](https://vercel.com/docs/rest-api/deployments/create-a-new-deployment), [variables del proyecto](https://vercel.com/docs/rest-api/projects/create-one-or-more-environment-variables).
 

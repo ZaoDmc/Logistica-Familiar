@@ -6,6 +6,7 @@ Base de una aplicación móvil web para compartir el inventario del hogar.
 
 - [Instrucciones base](Docs/Instrucciones_Base.md)
 - [Plan por fases y cuentas necesarias](Docs/Plan_Implementacion.md)
+- [Guía visual: colores, tipografías, tarjetas y cómo pedir cambios](Docs/Guia_Diseno_Visual.md)
 - [Fase 1: aplicar SQL, probar y crear el hogar](Docs/Fase_1_SQL.md)
 - [Fase 2: uso de cuentas, invitaciones y apariencia](Docs/Fase_2_Cuentas.md)
 - [Fase 3: inventario, cantidades, historial y pruebas](Docs/Fase_3_Inventario.md)
