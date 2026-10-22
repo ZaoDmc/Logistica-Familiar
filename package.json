@@ -20,7 +20,13 @@
     "inventory:qa": "node scripts/inventory-qa.mjs",
     "test:inventory:remote": "node scripts/test-inventory-remote.mjs",
     "test:sync": "node --experimental-strip-types scripts/test-inventory-sync.mjs",
-    "test:sync:remote": "node --experimental-strip-types scripts/test-realtime-remote.mjs"
+    "test:sync:remote": "node --experimental-strip-types scripts/test-realtime-remote.mjs",
+    "test:pwa": "node scripts/test-pwa.mjs",
+    "web:deploy": "node scripts/deploy-web.mjs",
+    "web:status": "node scripts/deploy-web.mjs status",
+    "web:configure": "node scripts/configure-production.mjs",
+    "test:web:remote": "node scripts/test-web-remote.mjs",
+    "web:prepare-git": "node scripts/configure-vercel-build.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -32,6 +38,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.11",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",

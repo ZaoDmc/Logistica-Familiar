@@ -16,6 +16,9 @@
   --error: #ffb4a7; --error-bg: #3c2422; --shadow: 0 18px 50px #00000016;
 }
 * { box-sizing: border-box; }
+.pwa-controls { margin: 28px 0; font-size: .9rem; }
+.pwa-controls summary { min-height: 44px; padding: 12px 0; cursor: pointer; color: var(--brand); font-weight: 650; }
+.pwa-controls details { border-top: 1px solid var(--border); padding-top: 8px; }
 body { margin: 0; min-width: 320px; }
 main { max-width: 1080px; margin: auto; padding: 28px 26px; }
 a { color: var(--brand); }

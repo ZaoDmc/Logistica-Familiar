@@ -6,6 +6,7 @@ import { Invitation } from './components/Invitation';
 import { Household } from './components/Household';
 import { supabase } from './lib/supabase';
 import { useTheme, type Theme } from './theme';
+import { PwaControls } from './components/PwaControls';
 
 const initialInvite = new URLSearchParams(location.hash.slice(1)).get('invite');
 const initialRecovery = new URLSearchParams(location.hash.slice(1)).get('type') === 'recovery';
@@ -70,6 +71,7 @@ export function App() {
       </> : <section className="card narrow"><span className="badge">Tu cuenta está lista</span><h1 className="card-title">Falta unirte a tu hogar</h1><p>Abre el enlace privado que te compartió el admin. Si estás preparando tu primer hogar, completa el alta inicial indicada en la guía del proyecto.</p><button className="secondary" onClick={() => setRevision(value => value + 1)}>Actualizar</button></section>}
     </> : <div className="welcome-layout"><section className="intro" aria-labelledby="title"><p className="eyebrow">UN HOGAR, TODOS AL DÍA</p><h1 id="title">Lo que hay en casa,<br /><em>a mano.</em></h1><p className="lead">Menos dudas en el supermercado.<br />Más organización entre quienes compartimos hogar.</p><ul className="category-preview" aria-label="Para todo lo cotidiano">{productIcons.filter(icon => ['food', 'cleaning', 'pet', 'paper'].includes(icon.id)).map(icon => <li key={icon.id}><span aria-hidden="true">{icon.symbol}</span>{icon.label}</li>)}</ul><p className="small">Un espacio privado para tu familia.</p></section>
       <section className="card login-card" aria-labelledby="login-title"><span className="badge">Qué bueno tenerte aquí</span><h2 id="login-title">Entra a tu hogar</h2><p>Usa tu cuenta para compartir la organización de casa.</p><LoginForm /><p className="note">¿Es tu primera vez? Abre el enlace de invitación que te compartió el admin.</p></section></div>}
+    <PwaControls />
     <footer>Lo cotidiano se lleva mejor en familia.</footer>
   </main>;
 }
