@@ -38,7 +38,10 @@ try {
     collect('dist');
     if (files.some(({file}) => /(^|\/)(\.|pass\.txt)/.test(file))) throw new Error('UNEXPECTED_PRIVATE_FILE_IN_DIST');
     const headers = JSON.parse(readFileSync('vercel.json','utf8')).headers;
-    files.push({file:'vercel.json',data:JSON.stringify({version:2,headers}),encoding:'utf-8'});
+    // El proyecto puede tener npm ci / Vite configurados para Git. Este artefacto
+    // ya está compilado: su configuración debe prevalecer sobre esos ajustes.
+    const staticSettings = {framework:null,buildCommand:'',installCommand:'',outputDirectory:'.'};
+    files.push({file:'vercel.json',data:JSON.stringify({version:2,...staticSettings,headers}),encoding:'utf-8'});
     const buildId = createHash('sha256').update(JSON.stringify(files)).digest('hex');
     let project;
     if (savedProject) project = await vercel(`/v9/projects/${savedProject.projectId}`);
@@ -54,7 +57,7 @@ try {
     let result = deployments?.find(item => item.meta?.lfBuildId === buildId && !['ERROR','CANCELED'].includes(item.state));
     if (!result) result = await vercel('/v13/deployments',{method:'POST',body:JSON.stringify({
       name:project.name,project:project.id,target:'production',files,
-      projectSettings:{framework:null,buildCommand:null,installCommand:null,outputDirectory:null},
+      projectSettings:staticSettings,
       meta:{lfBuildId:buildId,lfSourceBranch:execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim()},
     })});
     const record = {id:result.id || result.uid,projectId:project.id,buildId,state:result.readyState || result.state,url:`https://${result.url}`,aliases:result.alias || []};
