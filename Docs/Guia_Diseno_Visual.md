@@ -1,6 +1,6 @@
 # Guía de diseño visual — Logística Familiar
 
-Actualizada el 22 de octubre de 2026. Paleta elegida: **terracota y crema**, con variantes clara, oscura y automática.
+Actualizada el 22 de octubre de 2026. Paleta elegida: **terracota y crema**, con variantes clara y oscura.
 
 Esta guía es la referencia para pedir e implementar cambios de apariencia. Describe los valores actuales del proyecto; si se modifica una regla visual, actualizar también este documento. La implementación principal está en `src/styles.css`.
 
@@ -12,7 +12,7 @@ Facilitar que una persona pueda revisar rápidamente qué falta en casa mientras
 - Categorías e iconos ayudan a encontrar artículos; las descripciones complementan el nombre.
 - Textos y etiquetas deben explicar los estados. El color por sí solo no debe indicar disponibilidad, error o selección.
 - Diseño adaptable al ancho disponible. Altura de tarjetas automática para admitir nombres largos, errores y confirmaciones.
-- Mantener los temas Claro, Oscuro y Automático. En automático se respeta el tema del sistema; la elección manual persiste en el dispositivo.
+- Ofrecer solo Claro y Oscuro mediante botones de sol y luna. La elección persiste en el dispositivo y se sincroniza entre pestañas. El valor inicial es Claro; un antiguo valor Automático también pasa a Claro. No seguir cambios del tema del sistema.
 - No añadir fuentes remotas ni imágenes decorativas que dificulten consultar el stock.
 
 ## Colores principales y uso
@@ -47,14 +47,14 @@ Para cambiar la identidad principal de nuevo, revisar conjuntamente:
 4. Tema claro/oscuro de `public/offline.html`, que funciona sin cargar React.
 5. Colores del generador `scripts/generate-pwa-icons.py` y sus PNG en `public/icons/`.
 
-El manifest y los iconos usan el terracota principal claro como identidad estable. El icono de casa conserva su forma; solo cambia la paleta. Los navegadores y el sistema operativo pueden demorar en renovar un icono ya instalado.
+El manifest y los iconos usan el terracota principal claro como identidad estable. Los iconos de instalación conservan la casa terracota. La cabecera y la pantalla sin conexión usan la foto original de Logan (`public/icons/Logitan Bello.png`), sin modificarla. En cabecera mide 44 × 44 px, con radio circular y `object-fit: contain`; no estirar ni recortar su cara. Respetar las mayúsculas y codificar el espacio como `%20` en las URL. La foto está incluida en la caché pública de la PWA. Los navegadores y el sistema operativo pueden demorar en renovar un icono ya instalado.
 
 ## Tipografías principales y secundarias
 
 | Uso | Variable / familia | Regla |
 | --- | --- | --- |
 | Principal | `--font-main`: `system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` | Todo el contenido, formularios, navegación, cantidades y botones |
-| Secundaria | `--font-accent`: `Georgia, 'Times New Roman', serif` | Énfasis editorial del título de bienvenida, actualmente «a mano.» en cursiva |
+| Secundaria | `--font-accent`: `Georgia, 'Times New Roman', serif` | Énfasis editorial del título de bienvenida, actualmente «un orden» en cursiva |
 
 Las fuentes son locales al dispositivo. Por eso la apariencia exacta de la principal puede variar entre Android, iPhone y Windows. No se descargan fuentes externas. Mantener la secundaria limitada al énfasis; las cantidades y controles usan la principal.
 
@@ -101,7 +101,7 @@ Espaciado habitual: 4–8 px en agrupaciones compactas, 12–14 px entre control
 
 - Botones generales: altura mínima 44 px, radio 12 px, padding 10 × 16 px.
 - Botones +/−: **48 × 48 px**; mantenerlos visibles y separados del campo de cantidad.
-- Campos y selectores: mínimo 48 px de alto; selector de tema 44 px; textarea tiene altura adaptable.
+- Campos y selectores: mínimo 48 px de alto; botones de tema de al menos 44 × 44 px; textarea tiene altura adaptable.
 - Cantidad: ancho 108 px con límite de 45% del control; no forzar una anchura que desborde junto a los botones.
 - Foco de teclado: contorno de 3 px, separado 3 px. No quitarlo para mejorar una captura.
 - Selección y errores deben conservar texto/indicadores además del color. Mantener los nombres accesibles de sumar/restar por producto.
@@ -134,11 +134,17 @@ Si se solicita «tarjetas más pequeñas», aclarar qué se busca reducir: paddi
 
 ## Verificación y publicación
 
-1. Revisar Claro, Oscuro y Automático; comprobar contraste de las combinaciones cambiadas.
+1. Revisar Claro y Oscuro, incluida la persistencia al recargar; comprobar contraste de las combinaciones cambiadas.
 2. Revisar acceso, inventario, formulario y mensajes con nombres largos; comprobar desbordamiento horizontal en celular y escritorio.
 3. Si cambia la identidad, regenerar los PNG con `scripts/generate-pwa-icons.py` usando Python y Pillow; los archivos generados quedan versionados.
 4. Ejecutar `npm.cmd run build` y `npm.cmd run test:pwa`. Publicar y verificar el artefacto siguiendo la guía de fase 5.
 5. La PWA puede mostrar **Hay una versión nueva**. Guardar la edición y confirmar operaciones antes de recargar.
 6. Actualizar esta guía y la descripción del PR con los valores que realmente quedaron implementados.
 
-Validación de esta entrega: build/TypeScript y 41 comprobaciones PWA correctos; 16 combinaciones de contraste revisadas numéricamente en los dos temas. Navegador a 764 px y 360 px: bienvenida e inventario revisados en claro/oscuro, tema automático comprobado, sin desplazamiento horizontal. Con 345 px útiles de documento se observaron tarjetas de 309 px, padding de 18 px y botones +/− de 48 × 48 px. Se usó un hogar temporal para revisar las tarjetas, sin modificar el inventario real. Esto no sustituye una auditoría completa de accesibilidad ni las pruebas en teléfonos físicos.
+Validación de esta entrega: build/TypeScript y 41 comprobaciones PWA correctos; 16 combinaciones de contraste revisadas numéricamente en los dos temas. Navegador a 764 px y 360 px: bienvenida e inventario revisados en claro/oscuro, tema automático comprobado en la entrega original (retirado en la actualización de Logan), sin desplazamiento horizontal. Con 345 px útiles de documento se observaron tarjetas de 309 px, padding de 18 px y botones +/− de 48 × 48 px. Se usó un hogar temporal para revisar las tarjetas, sin modificar el inventario real. Esto no sustituye una auditoría completa de accesibilidad ni las pruebas en teléfonos físicos.
+
+## Bienvenida familiar y controles de tema
+
+La aplicación se usa principalmente entre mamá e hijo. Mantener un tono cercano y cariñoso, sin convertir los textos de bienvenida en publicidad. La frase se presenta como «Para que llevemos un orden» en el título y «mamita querida <3» con un corazón terracota debajo. La etiqueta superior dice «ENTRE MAMÁ Y YO». Logan también aparece como favicon de la pestaña.
+
+El selector de tema es una cápsula con dos botones: sol / Claro y luna / Oscuro. La selección se indica con fondo terracota y `aria-pressed`; ambos controles conservan un nombre accesible. Hasta 430 px se ocultan solo las etiquetas visuales para dejar más espacio a la marca; permanecen los iconos y los nombres accesibles. No hay opción Automático. La pantalla sin conexión también respeta la elección guardada.

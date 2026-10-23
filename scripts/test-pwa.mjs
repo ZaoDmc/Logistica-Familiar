@@ -11,7 +11,7 @@ function collect(directory, prefix = '') {
   for (const entry of readdirSync(directory,{withFileTypes:true})) {
     const path = `${prefix}/${entry.name}`;
     if (entry.isDirectory()) collect(`${directory}/${entry.name}`,path);
-    else files.set(origin + path, readFileSync(`${directory}/${entry.name}`));
+    else files.set(new URL(path, origin).href, readFileSync(`${directory}/${entry.name}`));
   }
 }
 collect('dist');
@@ -54,6 +54,8 @@ check(await (await navigation()).text() === 'respuesta de red','Navegación cons
 check(requests.at(-1).cache === 'no-store','Navegación sin caché HTTP');
 check(![...stores.get(cacheName).keys()].some(value => value.includes('private=')),'No guardar parámetros de navegación');
 failNetwork = true;
+const logan = await request('/icons/Logitan%20Bello.png');
+check(Buffer.from(await logan.arrayBuffer()).equals(readFileSync('public/icons/Logitan Bello.png')), 'Foto original de Logan disponible sin red, incluso con espacios en la URL');
 check((await (await navigation()).text()).includes('Tu hogar te espera.'),'Sin red entrega página pública sin datos del hogar');
 stores.set('lf-public-old',new Map()); stores.set('unrelated-cache',new Map());
 await life('activate'); check(claims === 1,'Activación toma control');

@@ -5,7 +5,7 @@ import { LoginForm, PasswordForm } from './components/AuthForms';
 import { Invitation } from './components/Invitation';
 import { Household } from './components/Household';
 import { supabase } from './lib/supabase';
-import { useTheme, type Theme } from './theme';
+import { useTheme } from './theme';
 import { PwaControls } from './components/PwaControls';
 
 const initialInvite = new URLSearchParams(location.hash.slice(1)).get('invite');
@@ -59,8 +59,11 @@ export function App() {
   }
   const home = homes.find(home => home.id === selected);
   return <main>
-    <header className="app-header"><a className="brand" href="/" aria-label="Logística Familiar, inicio"><span className="mark" aria-hidden="true">⌂</span><span>Logística Familiar<small>Nos organizamos en casa</small></span></a>
-      <div className="theme-control"><label htmlFor="theme">Tema</label><select id="theme" value={theme} onChange={event => setTheme(event.target.value as Theme)}><option value="system">Automático</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></div>
+    <header className="app-header"><a className="brand" href="/" aria-label="Logística Familiar, inicio"><img className="mark" src="/icons/Logitan%20Bello.png" alt="Logan, nuestro cachorro" width="44" height="44" /><span>Logística Familiar<small>Nos organizamos en casa</small></span></a>
+      <div className="theme-control" role="group" aria-label="Tema">
+        <button type="button" aria-label="Tema claro" title="Tema claro" aria-pressed={theme === 'light'} onClick={() => setTheme('light')}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></svg><span>Claro</span></button>
+        <button type="button" aria-label="Tema oscuro" title="Tema oscuro" aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z" /></svg><span>Oscuro</span></button>
+      </div>
     </header>
     {notice && <p className="alert" role="status">{notice}</p>}
     {booting ? <p className="card" role="status">Preparando tu acceso…</p> : !supabase ? <section className="card"><h1 className="card-title">La conexión está pendiente</h1><p>Completa la configuración del proyecto para comenzar.</p></section> : inviteToken ? <Invitation token={inviteToken} session={session} onDone={() => { setInviteToken(null); setRevision(value => value + 1); }} /> : session ? <>
@@ -69,8 +72,8 @@ export function App() {
         {homes.length > 1 && <div className="home-picker"><label htmlFor="home">Hogar</label><select id="home" value={selected} onChange={event => setSelected(event.target.value)}>{homes.map(home => <option key={home.id} value={home.id}>{home.name}</option>)}</select></div>}
         <Household key={`${home.id}/${revision}`} id={home.id} name={home.name} userId={session.user.id} />
       </> : <section className="card narrow"><span className="badge">Tu cuenta está lista</span><h1 className="card-title">Falta unirte a tu hogar</h1><p>Abre el enlace privado que te compartió el admin. Si estás preparando tu primer hogar, completa el alta inicial indicada en la guía del proyecto.</p><button className="secondary" onClick={() => setRevision(value => value + 1)}>Actualizar</button></section>}
-    </> : <div className="welcome-layout"><section className="intro" aria-labelledby="title"><p className="eyebrow">UN HOGAR, TODOS AL DÍA</p><h1 id="title">Lo que hay en casa,<br /><em>a mano.</em></h1><p className="lead">Menos dudas en el supermercado.<br />Más organización entre quienes compartimos hogar.</p><ul className="category-preview" aria-label="Para todo lo cotidiano">{productIcons.filter(icon => ['food', 'cleaning', 'pet', 'paper'].includes(icon.id)).map(icon => <li key={icon.id}><span aria-hidden="true">{icon.symbol}</span>{icon.label}</li>)}</ul><p className="small">Un espacio privado para tu familia.</p></section>
-      <section className="card login-card" aria-labelledby="login-title"><span className="badge">Qué bueno tenerte aquí</span><h2 id="login-title">Entra a tu hogar</h2><p>Usa tu cuenta para compartir la organización de casa.</p><LoginForm /><p className="note">¿Es tu primera vez? Abre el enlace de invitación que te compartió el admin.</p></section></div>}
+    </> : <div className="welcome-layout"><section className="intro" aria-labelledby="title"><p className="eyebrow">ENTRE MAMÁ Y YO</p><h1 id="title">Para que llevemos<br /><em>un orden</em></h1><p className="lead">mamita querida &lt;3 <svg className="welcome-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21 3.5 12.5a5.3 5.3 0 0 1 7.5-7.5l1 1 1-1a5.3 5.3 0 0 1 7.5 7.5Z" /></svg></p><ul className="category-preview" aria-label="Para todo lo cotidiano">{productIcons.filter(icon => ['food', 'cleaning', 'pet', 'paper'].includes(icon.id)).map(icon => <li key={icon.id}><span aria-hidden="true">{icon.symbol}</span>{icon.label}</li>)}</ul><p className="small">Nuestra lista para cuidar la casita.</p></section>
+      <section className="card login-card" aria-labelledby="login-title"><span className="badge">Qué bueno tenerte aquí</span><h2 id="login-title">Entra a tu hogar</h2><p>Entremos a ver qué hace falta en casa.</p><LoginForm /><p className="note">¿Es tu primera vez? Abre el enlace de invitación que te compartió el admin.</p></section></div>}
     <PwaControls />
     <footer>Lo cotidiano se lleva mejor en familia.</footer>
   </main>;
