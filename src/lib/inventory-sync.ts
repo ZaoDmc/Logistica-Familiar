@@ -26,6 +26,9 @@ export function watchInventory(client: SupabaseClient, home: string, changed: ()
     const events = table === 'products' ? ['INSERT', 'UPDATE'] as const : ['INSERT'] as const;
     for (const event of events) channel.on('postgres_changes', { event, schema: 'public', table, filter: `household_id=eq.${home}` }, () => { if (!stopped) changed(); });
   }
+  // Realtime no permite filtrar DELETE por hogar. Solo invalida la lectura;
+  // la consulta posterior sigue limitada por hogar y RLS, sin usar el payload.
+  channel.on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'categories' }, () => { if (!stopped) changed(); });
   channel.on('system', {}, event => {
     if (!stopped && event.status === 'error') { status('recovering'); changed(); }
   });

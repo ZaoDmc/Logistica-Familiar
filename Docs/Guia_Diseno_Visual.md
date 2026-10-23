@@ -148,3 +148,7 @@ Validación de esta entrega: build/TypeScript y 41 comprobaciones PWA correctos;
 La aplicación se usa principalmente entre mamá e hijo. Mantener un tono cercano y cariñoso, sin convertir los textos de bienvenida en publicidad. La frase se presenta como «Para que llevemos un orden» en el título y «mamita querida <3» con un corazón terracota debajo. La etiqueta superior dice «ENTRE MAMÁ Y YO». Logan también aparece como favicon de la pestaña.
 
 El selector de tema es una cápsula con dos botones: sol / Claro y luna / Oscuro. La selección se indica con fondo terracota y `aria-pressed`; ambos controles conservan un nombre accesible. Hasta 430 px se ocultan solo las etiquetas visuales para dejar más espacio a la marca; permanecen los iconos y los nombres accesibles. No hay opción Automático. La pantalla sin conexión también respeta la elección guardada.
+
+## Quitar categorías
+
+Cada encabezado de categoría incluye una acción de texto **Quitar categoría**, con nombre accesible que incluye la categoría y altura mínima de 44 px. El encabezado permite saltar de línea cuando falta espacio. La confirmación aparece dentro de la sección usando la tarjeta habitual, altura automática y borde de control. Cancelar y confirmar quedan separados por 10 px y pueden ocupar líneas distintas en celular. Si hay productos, el selector de destino es obligatorio; no habilitar la confirmación hasta elegir un destino válido.

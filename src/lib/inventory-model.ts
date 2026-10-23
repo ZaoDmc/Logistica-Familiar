@@ -6,6 +6,7 @@ export type Movement = { id: string; product_id: string; actor_name: string; pro
 export type NewProduct = { category_id: string; name: string; description: string; icon_id: ProductIconId; stock: number };
 export type Mutation =
   | { type: 'category'; name: string; icon_id: ProductIconId }
+  | { type: 'remove-category'; category_id: string; destination_id: string | null }
   | { type: 'product'; operation_id: string; product: NewProduct }
   | { type: 'stock'; operation_id: string; product_id: string; kind: 'delta' | 'set'; quantity: number; version: number | string | null };
 
@@ -31,6 +32,7 @@ export function isMutation(value: unknown): value is Mutation {
   const uuid = (value: unknown) => typeof value === 'string' && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value);
   const icon = (value: unknown) => ['food', 'dairy', 'produce', 'cleaning', 'pet', 'paper', 'hygiene', 'other'].includes(String(value));
   if (item.type === 'category') return typeof item.name === 'string' && item.name.trim().length > 0 && item.name.length <= 80 && icon(item.icon_id);
+  if (item.type === 'remove-category') return uuid(item.category_id) && (item.destination_id === null || (uuid(item.destination_id) && item.destination_id !== item.category_id));
   if (!uuid(item.operation_id)) return false;
   if (item.type === 'stock') return uuid(item.product_id) && typeof item.quantity === 'number' && Number.isSafeInteger(item.quantity)
     && ((item.kind === 'delta' && [1, -1].includes(item.quantity) && item.version === null)

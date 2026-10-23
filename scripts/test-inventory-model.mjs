@@ -19,4 +19,8 @@ check(!isMutation({type:'stock',operation_id:operation,product_id:product.id,kin
 check(!isMutation({type:'stock',operation_id:operation,product_id:product.id,kind:'delta',quantity:1.2,version:null}), 'Persistencia rechaza fracciones');
 check(isMutation({type:'product',operation_id:operation,product:{category_id:category.id,name:'Papel',description:'',icon_id:'paper',stock:0}}), 'Producto pendiente válido');
 check(!isMutation({type:'category',name:'Aseo',icon_id:'externo'}), 'Catálogo predeterminado obligatorio');
+check(isMutation({type:'remove-category',category_id:category.id,destination_id:other.id}), 'Traslado pendiente válido');
+check(isMutation({type:'remove-category',category_id:category.id,destination_id:null}), 'Quitar vacía admite destino nulo');
+check(!isMutation({type:'remove-category',category_id:category.id,destination_id:category.id}), 'No permite trasladar a sí misma');
+check(!isMutation({type:'remove-category',category_id:'alterada',destination_id:null}), 'Rechaza categoría pendiente alterada');
 console.log(`Inventario: ${passed} comprobaciones de búsqueda, cantidades y reintentos correctas.`);

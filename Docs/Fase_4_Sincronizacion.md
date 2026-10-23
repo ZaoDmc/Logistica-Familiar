@@ -68,3 +68,9 @@ La prueba remota necesita la conexión SQL y el token administrativo privados de
 El PR de fase 4 parte de `feat/inventario-movil` porque el PR de fase 3 continúa abierto. Integrar primero fase 3; después revisar que la base del PR de fase 4 sea `main` y que su diff incluya solo la fase 4. No se fusionan automáticamente los PR.
 
 La fase 5 permitirá compartir una URL HTTPS e instalar la web en el celular. Allí comprobaremos con ambos teléfonos reales cambios sin recarga, modo avión, retorno de datos móviles, bloqueo de pantalla y reanudación.
+
+## Extensión: eliminación de categorías (23 de octubre de 2026)
+
+El canal escucha también DELETE de categorías para que quitar una vacía se refleje sin esperar al sondeo de 30 segundos. Realtime no admite filtro de hogar para DELETE: el evento se usa únicamente como aviso para volver a consultar, sin leer ni mostrar su contenido. La lectura posterior conserva el filtro del hogar y RLS. El traslado de productos también genera los eventos UPDATE ya existentes. En reconexión se recupera el estado actual.
+
+La prueba remota se amplió a 13 comprobaciones: en cinco sesiones independientes se verifican también la eliminación vacía, el traslado sin cambiar cantidades/versiones y la conservación del historial. La ejecución de esta mejora midió 666, 567 y 490 ms para las tres muestras de cambio de stock; no constituye una garantía de latencia. Los datos y cuentas temporales se eliminaron al terminar.

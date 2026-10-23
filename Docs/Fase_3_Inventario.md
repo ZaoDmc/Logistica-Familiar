@@ -110,4 +110,14 @@ Para una revisión visual aislada, `npm.cmd run inventory:qa` prepara hogares y 
 
 ## Pendientes de las siguientes fases
 
-Fase 4: recibir cambios automáticamente entre dispositivos, recuperar estado al volver a la aplicación y probar cortes reales de red. Fase 5: publicación HTTPS y PWA instalable. Edición/borrado de categorías o productos, stock mínimo configurable y notificaciones push continúan fuera de este alcance.
+Fase 4: recibir cambios automáticamente entre dispositivos, recuperar estado al volver a la aplicación y probar cortes reales de red. Fase 5: publicación HTTPS y PWA instalable. La edición de categorías y el borrado de productos, el stock mínimo configurable y las notificaciones push continúan fuera de este alcance. Quitar categorías se añadió en la mejora del 23 de octubre de 2026, descrita abajo.
+
+## Mejora del 23 de octubre de 2026: quitar categorías
+
+Admin e integrantes disponen de **Quitar categoría** junto a cada nombre. La pantalla pide confirmación. Si contiene productos, exige elegir otra categoría del mismo hogar para trasladarlos sin alterar cantidades, versiones de stock ni movimientos. Si es la única categoría y tiene productos, primero hay que crear un destino. Una categoría vacía se puede quitar directamente, incluso si es la última.
+
+La función SQL `remove_category` aplica traslado y eliminación en una transacción y comprueba el hogar autenticado. Los reintentos de la misma categoría ya retirada son seguros. Si alguien agrega un producto mientras la confirmación sigue abierta, el servidor exige un destino; no borra productos. La eliminación no ofrece deshacer: se puede volver a crear una categoría y reorganizar después, pero no se recupera el UUID anterior.
+
+La migración `202610230001_remove_category.sql` debe aplicarse antes de publicar la interfaz: `npm.cmd run db:migrate`. Las tablas no conceden borrado directo al navegador. La operación usa el mismo bloqueo de interfaz, recuperación de errores y reintentos pendientes que el resto del inventario. Un filtro que apuntaba a una categoría retirada vuelve automáticamente a todas las categorías.
+
+Validación adicional: 15 pruebas SQL locales y en Supabase para permisos, destinos ajenos, conservación de stock/historial, reintento y categorías vacías; 28 comprobaciones del modelo; 22 de sincronización. Se revisó la confirmación, selección de destino y cancelación como integrante temporal en claro/oscuro a 360 px, sin desbordamiento horizontal. No se usó el hogar familiar.

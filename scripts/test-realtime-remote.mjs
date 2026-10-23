@@ -46,6 +46,17 @@ try {
   check(samples.every(ms => ms <= 2000), 'Cambios y reconsulta en cinco sesiones dentro de dos segundos');
   await Promise.all([change(clients[0]), change(clients[1])]);
   await wait(() => versions.every(value => value === 6), 'Cambios simultáneos'); check(true, 'Concurrencia sincronizada');
+  const target = await ok(clients[1].from('categories').insert({household_id:fixture.home,name:'Destino Realtime',icon_id:'other'}).select('id').single());
+  const empty = await ok(clients[1].from('categories').insert({household_id:fixture.home,name:'Vacía Realtime',icon_id:'other'}).select('id').single());
+  await wait(() => categories.every(count => count === 3), 'Categorías de traslado recibidas');
+  await ok(clients[1].rpc('remove_category',{p_household_id:fixture.home,p_category_id:empty.id,p_destination_id:null}));
+  await wait(() => categories.every(count => count === 2), 'Eliminación vacía recibida sin cambios de productos');
+  check(true, 'Quitar vacía se refleja en cinco sesiones por Realtime');
+  await ok(clients[1].rpc('remove_category',{p_household_id:fixture.home,p_category_id:category.id,p_destination_id:target.id}));
+  await wait(() => categories.every(count => count === 1), 'Traslado y categoría sincronizados');
+  const moved = await ok(clients[0].from('products').select('category_id,stock,version').eq('id',product).single());
+  check(moved.category_id === target.id && moved.stock === 6 && Number(moved.version) === 6, 'Traslado conserva cantidades y versiones en el destino');
+  check(histories.every(value => value === 6), 'Traslado no altera el historial de stock');
   stops[4](); const before = events[4]; await change(clients[0]);
   await wait(() => versions[0] === 7, 'Cambio con una sesión desconectada');
   check(events[4] === before, 'Suscripción liberada no recibe cambios');

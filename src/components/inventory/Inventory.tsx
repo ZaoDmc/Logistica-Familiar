@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { productIcons } from '../../catalogs/icons';
 import { useInventory } from '../../hooks/useInventory';
 import { filterProducts } from '../../lib/inventory-model';
 import { InventoryForm } from './InventoryForms';
 import { ProductCard } from './ProductCard';
 import { MovementHistory } from './MovementHistory';
+import { RemoveCategory } from './RemoveCategory';
 
 export function Inventory({ home, userId, view, showHistory, historyProduct, setHistoryProduct }: {
   home: string; userId: string; view: 'products' | 'history' | 'members'; showHistory: (product: string) => void;
@@ -13,6 +14,10 @@ export function Inventory({ home, userId, view, showHistory, historyProduct, set
   const state = useInventory(home, userId);
   const [form, setForm] = useState<'category' | 'product' | null>(null), [search, setSearch] = useState('');
   const [category, setCategory] = useState(''), [buying, setBuying] = useState(false);
+  const [removing, setRemoving] = useState('');
+  useEffect(() => {
+    if (category && state.snapshot && !state.snapshot.categories.some(item => item.id === category)) setCategory('');
+  }, [category, state.snapshot]);
   const categories = state.snapshot?.categories || [], products = state.snapshot?.products || [];
   const filtered = filterProducts(products, categories, search, category, buying);
   const groups = categories.filter(item => (!category || item.id === category) && (filtered.some(product => product.category_id === item.id) || (!search.trim() && !buying)));
@@ -30,7 +35,7 @@ export function Inventory({ home, userId, view, showHistory, historyProduct, set
       {!categories.length && state.snapshot && <section className="card empty-state"><span aria-hidden="true">📦</span><h2>Empecemos a organizar la casa</h2><p>Crea una categoría, como Alimentos o Aseo, y agrega los artículos que quieres tener a mano.</p><button className="primary" disabled={state.disabled} onClick={() => setForm('category')}>Crear primera categoría</button></section>}
       {categories.length > 0 && <><div className="inventory-filters"><div><label htmlFor="inventory-search">Buscar en el hogar</label><input id="inventory-search" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Producto, marca o descripción" /></div><div><label htmlFor="inventory-category">Filtrar por categoría</label><select id="inventory-category" value={category} onChange={event => setCategory(event.target.value)}><option value="">Todas las categorías</option>{categories.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></div></div>
         <div className="inventory-filter-row"><div className="filter-switch" aria-label="Disponibilidad"><button aria-pressed={!buying} onClick={() => setBuying(false)}>Todos</button><button aria-pressed={buying} onClick={() => setBuying(true)}>Por comprar</button></div><span className="small" role="status">{filtered.length} {filtered.length === 1 ? 'producto' : 'productos'}</span></div>
-        {groups.map(item => <section key={item.id} className="category-group" aria-labelledby={`category-${item.id}`}><h2 id={`category-${item.id}`}><span aria-hidden="true">{productIcons.find(icon => icon.id === item.icon_id)?.symbol || '📦'}</span> {item.name}</h2><div className="product-grid">{filtered.filter(product => product.category_id === item.id).map(product => <ProductCard key={product.id} product={product} disabled={state.disabled} mutate={state.mutate} showHistory={() => showHistory(product.id)} />)}</div>{!filtered.some(product => product.category_id === item.id) && <p className="empty-copy">Todavía no hay productos en esta categoría.</p>}</section>)}
+        {groups.map(item => <section key={item.id} className="category-group" aria-labelledby={`category-${item.id}`}><div className="category-heading"><h2 id={`category-${item.id}`}><span aria-hidden="true">{productIcons.find(icon => icon.id === item.icon_id)?.symbol || '📦'}</span> {item.name}</h2><button type="button" className="text-button" disabled={state.disabled} aria-label={`Quitar categoría ${item.name}`} aria-expanded={removing === item.id} onClick={() => setRemoving(removing === item.id ? '' : item.id)}>Quitar categoría</button></div>{removing === item.id && <RemoveCategory key={item.id} category={item} categories={categories} count={products.filter(product => product.category_id === item.id).length} disabled={state.disabled} mutate={state.mutate} onClose={() => setRemoving('')} />}<div className="product-grid">{filtered.filter(product => product.category_id === item.id).map(product => <ProductCard key={product.id} product={product} disabled={state.disabled} mutate={state.mutate} showHistory={() => showHistory(product.id)} />)}</div>{!filtered.some(product => product.category_id === item.id) && <p className="empty-copy">Todavía no hay productos en esta categoría.</p>}</section>)}
         {!filtered.length && (search.trim() || buying) && <div className="card empty-state"><h2>{buying && !search.trim() ? 'Nada pendiente en esta selección' : 'No encontramos esos artículos'}</h2><p>{buying && !search.trim() ? 'Los productos con cantidad cero aparecerán aquí.' : 'Prueba otro nombre, marca o categoría.'}</p><button className="secondary" onClick={() => { setSearch(''); setCategory(''); setBuying(false); }}>Ver todos los productos</button></div>}
       </>}
     </div>

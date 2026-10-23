@@ -160,7 +160,13 @@ textarea { font: inherit; width: 100%; min-width: 0; padding: 12px; border: 1px 
 .filter-switch button { background: transparent; color: var(--muted); font-size: .8rem; padding: 10px 13px; }
 .filter-switch button[aria-pressed='true'] { color: var(--brand); background: var(--surface-soft); }
 .category-group { margin-top: 32px; }
-.category-group > h2 { font-size: 1.1rem; margin-bottom: 15px; }
+.category-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 15px; }
+.category-heading h2 { font-size: 1.1rem; margin: 0; overflow-wrap: anywhere; min-width: 0; }
+.category-heading button { flex-shrink: 0; }
+.remove-category { margin: 0 0 18px; border-color: var(--control-border); }
+.remove-category select { margin: 8px 0 18px; }
+.remove-category .button-row { gap: 10px; }
+.remove-category .primary { white-space: normal; text-align: center; }
 .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .product-card { border: 1px solid var(--border); border-radius: 18px; padding: 20px; background: var(--surface); min-width: 0; }
 .product-heading { display: flex; align-items: flex-start; gap: 12px; }

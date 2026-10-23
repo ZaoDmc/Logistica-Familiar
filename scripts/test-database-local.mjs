@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
 import { runDatabaseTests } from './db-test-suite.mjs';
 import { runAccountDatabaseTests } from './db-accounts-suite.mjs';
+import { runCategoryDatabaseTests } from './db-category-suite.mjs';
 
 const db = new PGlite();
 try {
@@ -22,6 +23,7 @@ try {
   for (const file of readdirSync(directory).filter(name => /^\d+_.+\.sql$/.test(name)).sort()) await db.exec(readFileSync(new URL(file, directory), 'utf8'));
   await runDatabaseTests((sql, params) => db.query(sql, params));
   await runAccountDatabaseTests((sql, params) => db.query(sql, params));
+  await runCategoryDatabaseTests((sql, params) => db.query(sql, params));
 } finally {
   await db.close();
 }

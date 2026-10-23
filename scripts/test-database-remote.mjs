@@ -2,6 +2,7 @@ import { databaseConnection, reportDatabaseError } from './database-connection.m
 import { runDatabaseTests } from './db-test-suite.mjs';
 import { runConcurrencyTests } from './db-concurrency-suite.mjs';
 import { runAccountDatabaseTests } from './db-accounts-suite.mjs';
+import { runCategoryDatabaseTests } from './db-category-suite.mjs';
 
 let pool;
 try {
@@ -10,6 +11,7 @@ try {
   try {
     await runDatabaseTests((sql, params) => client.query(sql, params));
     await runAccountDatabaseTests((sql, params) => client.query(sql, params));
+    await runCategoryDatabaseTests((sql, params) => client.query(sql, params));
   }
   finally { client.release(); }
   await runConcurrencyTests(pool);

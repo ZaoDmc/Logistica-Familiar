@@ -16,13 +16,14 @@ export function inventoryError(error: unknown): InventoryError {
     '42501': 'Ya no tienes acceso a esta operación. Actualiza o vuelve a iniciar sesión.',
     '23503': 'La categoría ya no está disponible. Actualiza la lista.',
     '23502': 'Completa los campos obligatorios.',
+    'P0001': 'Esta categoría tiene productos. Elige otra categoría para conservarlos antes de quitarla.',
     '22023': 'No se pudo validar la operación. Actualiza y revisa los datos.',
     'PGRST301': 'Tu sesión venció. Vuelve a iniciar sesión.',
   };
   return new InventoryError(code, messages[code] || 'No pudimos confirmar la operación. Revisa tu conexión.');
 }
 export function isDefiniteError(error: InventoryError) {
-  return ['40001', 'PT409', '23514', '23505', '42501', '23503', '23502', '22023', 'PGRST301'].includes(error.code);
+  return ['40001', 'PT409', '23514', '23505', '42501', '23503', '23502', '22023', 'PGRST301', 'P0001'].includes(error.code);
 }
 function client() { if (!supabase) throw new InventoryError('CONFIG', 'Falta la conexión al hogar.'); return supabase; }
 async function allRows<T extends { id: string }>(table: string, fields: string, home: string): Promise<T[]> {
@@ -51,6 +52,8 @@ export async function applyMutation(home: string, mutation: Mutation) {
   const signal = AbortSignal.timeout(15000);
   const query = mutation.type === 'category'
     ? db.from('categories').insert({ household_id: home, name: mutation.name.trim(), icon_id: mutation.icon_id }).select('id').abortSignal(signal).single()
+    : mutation.type === 'remove-category'
+      ? db.rpc('remove_category', { p_household_id: home, p_category_id: mutation.category_id, p_destination_id: mutation.destination_id }).abortSignal(signal)
     : mutation.type === 'product'
       ? db.rpc('create_product', { p_household_id: home, p_category_id: mutation.product.category_id,
         p_name: mutation.product.name.trim(), p_description: mutation.product.description.trim(), p_icon_id: mutation.product.icon_id,
