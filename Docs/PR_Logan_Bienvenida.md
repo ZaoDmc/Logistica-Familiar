@@ -7,3 +7,5 @@ La elección se guarda entre visitas y se comparte entre pestañas. El tema inic
 La guía visual documenta las dimensiones de Logan, el tono familiar y las reglas del nuevo selector.
 
 Validación: build y TypeScript correctos; 44 comprobaciones PWA correctas. Revisión visual en Claro y Oscuro a 360 y 655 px, persistencia del modo oscuro tras recargar, foto original cargada, controles móviles de tema de 44 × 44 px y ausencia de desbordamiento horizontal a 360 px. Logan también se utiliza como favicon.
+
+Publicación: https://logistica-familiar.vercel.app/ confirmada en estado READY. Las 43 comprobaciones remotas de integridad, cabeceras, Auth y CORS pasaron. Rama: codex/logan-bienvenida-temas. Commit de implementación: ab9df61.
