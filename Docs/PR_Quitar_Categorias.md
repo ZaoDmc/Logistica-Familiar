@@ -16,3 +16,5 @@ La interfaz conserva el tratamiento de operaciones pendientes y errores, limpia 
 - Migración aplicada en Supabase. Pruebas con datos sintéticos, sin modificar el hogar familiar.
 
 Aplicar la migración antes de publicar la interfaz. La actualización llega por el aviso de nueva versión de la PWA; guardar operaciones pendientes antes de recargar. Las pruebas físicas en los teléfonos familiares siguen pendientes.
+
+Publicación verificada el 23 de octubre de 2026: https://logistica-familiar.vercel.app/ en estado READY, con 55 comprobaciones HTTPS correctas de integridad, cabeceras, Auth y CORS. Rama codex/quitar-categorias; implementación 62b68cc. Hogares y cuentas temporales eliminados.
