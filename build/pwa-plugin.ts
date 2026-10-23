@@ -15,7 +15,7 @@ export function householdPwa(): Plugin {
       }
     },
     generateBundle(_options, bundle) {
-      const publicFiles = ['offline.html', 'icons/Logitan Bello.png', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png'];
+      const publicFiles = ['offline.html', 'icons/Logitan Bello.png', 'manifest.webmanifest', 'icons/logan-192.png', 'icons/logan-512.png', 'icons/logan-maskable-512.png', 'icons/logan-apple-touch.png'];
       const assets = Object.keys(bundle).filter(path => /^assets\/.+\.(js|css)$/.test(path));
       const version = createHash('sha256');
       for (const path of Object.keys(bundle).sort()) {

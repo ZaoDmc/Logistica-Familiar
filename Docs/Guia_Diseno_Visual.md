@@ -45,9 +45,9 @@ Para cambiar la identidad principal de nuevo, revisar conjuntamente:
 2. `theme-color` en `index.html`.
 3. Colores del manifest en `public/manifest.webmanifest`.
 4. Tema claro/oscuro de `public/offline.html`, que funciona sin cargar React.
-5. Colores del generador `scripts/generate-pwa-icons.py` y sus PNG en `public/icons/`.
+5. Colores del generador `scripts/generate-pwa-icons.ps1` y sus PNG en `public/icons/`.
 
-El manifest y los iconos usan el terracota principal claro como identidad estable. Los iconos de instalación conservan la casa terracota. La cabecera y la pantalla sin conexión usan la foto original de Logan (`public/icons/Logitan Bello.png`), sin modificarla. En cabecera mide 44 × 44 px, con radio circular y `object-fit: contain`; no estirar ni recortar su cara. Respetar las mayúsculas y codificar el espacio como `%20` en las URL. La foto está incluida en la caché pública de la PWA. Los navegadores y el sistema operativo pueden demorar en renovar un icono ya instalado.
+El manifest y los iconos usan el terracota principal claro como identidad estable. Los iconos de instalación usan la foto original de Logan sobre fondo crema, exportada a 192/512 px y Apple 180 px. El icono adaptable reserva margen: la foto ocupa un 76% del cuadrado y queda dentro del círculo seguro central del 80%. Los demás usan 94%. Los archivos tienen nombres `logan-*` para diferenciarse de los iconos antiguos. La imagen original mide 112 × 112 px; exportarla a mayor tamaño no agrega detalle. La cabecera y la pantalla sin conexión usan la foto original de Logan (`public/icons/Logitan Bello.png`), sin modificarla. En cabecera mide 44 × 44 px, con radio circular y `object-fit: contain`; no estirar ni recortar su cara. Respetar las mayúsculas y codificar el espacio como `%20` en las URL. La foto está incluida en la caché pública de la PWA. Los navegadores y el sistema operativo pueden demorar en renovar un icono ya instalado.
 
 ## Tipografías principales y secundarias
 
@@ -136,7 +136,7 @@ Si se solicita «tarjetas más pequeñas», aclarar qué se busca reducir: paddi
 
 1. Revisar Claro y Oscuro, incluida la persistencia al recargar; comprobar contraste de las combinaciones cambiadas.
 2. Revisar acceso, inventario, formulario y mensajes con nombres largos; comprobar desbordamiento horizontal en celular y escritorio.
-3. Si cambia la identidad, regenerar los PNG con `scripts/generate-pwa-icons.py` usando Python y Pillow; los archivos generados quedan versionados.
+3. Si cambia la identidad, regenerar los PNG con `scripts/generate-pwa-icons.ps1` usando PowerShell y System.Drawing en Windows; los archivos generados quedan versionados.
 4. Ejecutar `npm.cmd run build` y `npm.cmd run test:pwa`. Publicar y verificar el artefacto siguiendo la guía de fase 5.
 5. La PWA puede mostrar **Hay una versión nueva**. Guardar la edición y confirmar operaciones antes de recargar.
 6. Actualizar esta guía y la descripción del PR con los valores que realmente quedaron implementados.

@@ -41,9 +41,9 @@ check([...stores.get(cacheName).keys()].every(url => !new URL(url).pathname.ends
 check(await request('https://project.supabase.co/auth/v1/token') === undefined, 'Auth externo no se intercepta');
 check(await request('https://project.supabase.co/rest/v1/products') === undefined, 'Inventario externo no se intercepta');
 check(await request('/api/private') === undefined, 'API propia no se intercepta');
-check(await request('/icons/icon-192.png',{method:'POST'}) === undefined, 'POST nunca se intercepta');
-check(await request('/icons/icon-192.png?token=private') === undefined, 'URLs con parámetros no entran en caché pública');
-const icon = await request('/icons/icon-192.png'); check((await icon.arrayBuffer()).byteLength > 100,'Icono público disponible');
+check(await request('/icons/logan-192.png',{method:'POST'}) === undefined, 'POST nunca se intercepta');
+check(await request('/icons/logan-192.png?token=private') === undefined, 'URLs con parámetros no entran en caché pública');
+const icon = await request('/icons/logan-192.png'); check((await icon.arrayBuffer()).byteLength > 100,'Icono público disponible');
 // Request real de navegación para el constructor del trabajador.
 async function navigation() {
   const nav = new Request(origin + '/?private=example');
