@@ -124,3 +124,7 @@ npm.cmd run build
 ```
 
 Las pruebas remotas de cuentas crean usuarios sintéticos temporales sin enviar correos, y los retiran al terminar. Necesitan token de Supabase y conexión SQL. No usar fixtures reales ni modificar sus correos a direcciones de familiares.
+
+## Alta de otras familias (25 de octubre de 2026)
+
+Se añadió un procedimiento operativo de alta independiente, con revisión previa, creación de hogar y admin, verificación RLS y entrega de un enlace privado para elegir contraseña. No se habilita el registro público ni se invita a estas personas al hogar original. Ver `Docs/Alta_Familias.md` y `scripts/onboard-household.mjs`. Datos y enlaces quedan en archivos locales excluidos de Git.

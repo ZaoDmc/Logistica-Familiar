@@ -9,6 +9,7 @@ Base de una aplicación móvil web para compartir el inventario del hogar.
 - [Guía visual: colores, tipografías, tarjetas y cómo pedir cambios](Docs/Guia_Diseno_Visual.md)
 - [Fase 1: aplicar SQL, probar y crear el hogar](Docs/Fase_1_SQL.md)
 - [Fase 2: uso de cuentas, invitaciones y apariencia](Docs/Fase_2_Cuentas.md)
+- [Alta controlada de otras familias y entrega privada de acceso](Docs/Alta_Familias.md)
 - [Fase 3: inventario, cantidades, historial y pruebas](Docs/Fase_3_Inventario.md)
 - [Módulo Reposición y cantidad en riesgo](Docs/PR_Stock_En_Riesgo.md)
 - [Mejora: quitar categorías sin perder productos](Docs/PR_Quitar_Categorias.md)
