@@ -22,7 +22,7 @@ try {
         ['Aseo','paper','Papel higiénico','Paquetes de doce rollos',0],
       ]) {
         const result=await client.from('categories').insert({household_id:fixture.home,name:category,icon_id:icon}).select('id').single(); if(result.error)throw result.error;
-        const product=await client.rpc('create_product',{p_household_id:fixture.home,p_category_id:result.data.id,p_name:name,p_description:description,p_icon_id:icon,p_initial_stock:stock,p_operation_id:randomUUID()}); if(product.error)throw product.error;
+        const product=await client.rpc('create_product_with_risk',{p_household_id:fixture.home,p_category_id:result.data.id,p_name:name,p_description:description,p_icon_id:icon,p_initial_stock:stock,p_operation_id:randomUUID(),p_risk_quantity:category === 'Alimentos' ? 2 : 0}); if(product.error)throw product.error;
       }
       console.log('Hogar de prueba visual preparado. Credenciales temporales en .inventory-qa.local, excluido de Git.');
     } catch(error) { await cleanupInventoryFixture(admin,pool,fixture); unlinkSync(file); throw error; }

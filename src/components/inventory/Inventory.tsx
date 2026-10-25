@@ -6,9 +6,10 @@ import { InventoryForm } from './InventoryForms';
 import { ProductCard } from './ProductCard';
 import { MovementHistory } from './MovementHistory';
 import { RemoveCategory } from './RemoveCategory';
+import { Restock } from './Restock';
 
 export function Inventory({ home, userId, view, showHistory, historyProduct, setHistoryProduct }: {
-  home: string; userId: string; view: 'products' | 'history' | 'members'; showHistory: (product: string) => void;
+  home: string; userId: string; view: 'products' | 'restock' | 'history' | 'members'; showHistory: (product: string) => void;
   historyProduct: string; setHistoryProduct: (value: string) => void;
 }) {
   const state = useInventory(home, userId);
@@ -39,6 +40,7 @@ export function Inventory({ home, userId, view, showHistory, historyProduct, set
         {!filtered.length && (search.trim() || buying) && <div className="card empty-state"><h2>{buying && !search.trim() ? 'Nada pendiente en esta selección' : 'No encontramos esos artículos'}</h2><p>{buying && !search.trim() ? 'Los productos con cantidad cero aparecerán aquí.' : 'Prueba otro nombre, marca o categoría.'}</p><button className="secondary" onClick={() => { setSearch(''); setCategory(''); setBuying(false); }}>Ver todos los productos</button></div>}
       </>}
     </div>
+    <div hidden={view !== 'restock'}>{state.snapshot && <Restock products={products} categories={categories} disabled={state.disabled} mutate={state.mutate} showHistory={showHistory} />}</div>
     <div hidden={view !== 'history'}><MovementHistory home={home} products={products} product={historyProduct} setProduct={setHistoryProduct} revision={state.revision} visible={view === 'history'} /></div>
   </section>;
 }

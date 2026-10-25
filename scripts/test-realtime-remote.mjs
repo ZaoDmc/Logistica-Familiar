@@ -4,6 +4,7 @@ import { adminClient } from './supabase-management.mjs';
 import { databaseConnection, reportDatabaseError } from './database-connection.mjs';
 import { createInventoryFixture, cleanupInventoryFixture, loginFixture } from './inventory-test-fixture.mjs';
 import { watchInventory } from '../src/lib/inventory-sync.ts';
+import { stockStatus } from '../src/lib/inventory-model.ts';
 const fixture = { users: [] }, clients = [], stops = [], samples = [];
 let pool, admin, passed = 0;
 const check = (condition, label) => { assert.ok(condition, label); passed++; };
@@ -19,15 +20,16 @@ try {
   for (let index = 0; index < 5; index++) clients.push(await loginFixture(fixture.users[index % 2]));
   const outsider = await loginFixture(fixture.users[2]); clients.push(outsider);
   const versions = Array(5).fill(0), events = Array(5).fill(0), categories = Array(5).fill(0), histories = Array(5).fill(0), ready = Array(5).fill(false);
+  const states = Array(5).fill(''), riskVersions = Array(5).fill(0);
   let product, forbidden = 0;
   for (let index = 0; index < 5; index++) {
     stops.push(watchInventory(clients[index], fixture.home, () => {
       events[index]++;
       void Promise.all([
-        clients[index].from('products').select('version').eq('household_id', fixture.home),
+        clients[index].from('products').select('version,stock,risk_quantity,risk_version').eq('household_id', fixture.home),
         clients[index].from('categories').select('id').eq('household_id', fixture.home),
         clients[index].from('stock_movements').select('id').eq('household_id', fixture.home),
-      ]).then(([p,c,h]) => { versions[index] = Math.max(0,...(p.data || []).map(row => Number(row.version))); categories[index] = c.data?.length || 0; histories[index] = h.data?.length || 0; });
+      ]).then(([p,c,h]) => { versions[index] = Math.max(0,...(p.data || []).map(row => Number(row.version))); categories[index] = c.data?.length || 0; histories[index] = h.data?.length || 0; if(p.data?.[0]) {states[index]=stockStatus(p.data[0]);riskVersions[index]=Number(p.data[0].risk_version);} });
     }, status => { ready[index] = status === 'live'; console.log(`Sesión ${index + 1}: ${status}`); }));
   }
   let outsiderReady = false;
@@ -57,11 +59,19 @@ try {
   const moved = await ok(clients[0].from('products').select('category_id,stock,version').eq('id',product).single());
   check(moved.category_id === target.id && moved.stock === 6 && Number(moved.version) === 6, 'Traslado conserva cantidades y versiones en el destino');
   check(histories.every(value => value === 6), 'Traslado no altera el historial de stock');
+  await ok(clients[1].rpc('set_product_risk',{p_product_id:product,p_risk_quantity:6,p_expected_version:1}));
+  await wait(() => states.every(value => value === 'warning') && riskVersions.every(value => value === 2),'Límite y Por agotarse recibidos');
+  check(true,'Límite inclusivo y estado amarillo sincronizados en cinco sesiones');
+  await ok(clients[0].rpc('change_stock',{p_product_id:product,p_operation_id:randomUUID(),p_kind:'set',p_quantity:0,p_expected_version:6}));
+  await wait(() => states.every(value => value === 'missing') && versions.every(value => value === 7),'Por comprar en cero');
+  check(true,'Stock cero tiene prioridad y sincroniza Por comprar');
+  await ok(clients[0].rpc('change_stock',{p_product_id:product,p_operation_id:randomUUID(),p_kind:'set',p_quantity:6,p_expected_version:7}));
+  await wait(() => states.every(value => value === 'warning') && versions.every(value => value === 8),'Restaurar stock en riesgo');
   stops[4](); const before = events[4]; await change(clients[0]);
-  await wait(() => versions[0] === 7, 'Cambio con una sesión desconectada');
+  await wait(() => versions[0] === 9 && states[0] === 'available', 'Repuesto sale de alertas con una sesión desconectada');
   check(events[4] === before, 'Suscripción liberada no recibe cambios');
   let recovered = false;
-  stops[4] = watchInventory(clients[4], fixture.home, () => { void clients[4].from('products').select('version').eq('id',product).single().then(({data}) => { recovered = Number(data?.version) === 7; }); }, () => {});
+  stops[4] = watchInventory(clients[4], fixture.home, () => { void clients[4].from('products').select('version,stock,risk_quantity').eq('id',product).single().then(({data}) => { recovered = Number(data?.version) === 9 && stockStatus(data) === 'available'; }); }, () => {});
   await wait(() => recovered, 'Reconciliación después de reconectar'); check(recovered, 'Recupera cambios perdidos al suscribirse de nuevo');
   check(forbidden === 0, 'RLS impide notificaciones a un usuario ajeno');
   check((await ok(outsider.from('products').select('id').eq('household_id',fixture.home))).length === 0, 'Reconsulta ajena tampoco obtiene datos');

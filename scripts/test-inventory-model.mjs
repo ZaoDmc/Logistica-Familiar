@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { parseStock, filterProducts, isMutation } from '../src/lib/inventory-model.ts';
+import { parseStock, filterProducts, isMutation, stockStatus } from '../src/lib/inventory-model.ts';
 let passed = 0;
 const check = (condition, label) => { assert.ok(condition, label); passed++; };
 for (const [input, expected] of [['0',0], [' 12 ',12], ['0002',2], ['1000000',1000000], ['',null], [' ',null], ['-1',null], ['1.5',null], ['1e2',null], ['+1',null], ['1000001',null], ['Infinity',null]]) check(parseStock(input) === expected, `Cantidad: ${input}`);
@@ -23,4 +23,10 @@ check(isMutation({type:'remove-category',category_id:category.id,destination_id:
 check(isMutation({type:'remove-category',category_id:category.id,destination_id:null}), 'Quitar vacía admite destino nulo');
 check(!isMutation({type:'remove-category',category_id:category.id,destination_id:category.id}), 'No permite trasladar a sí misma');
 check(!isMutation({type:'remove-category',category_id:'alterada',destination_id:null}), 'Rechaza categoría pendiente alterada');
+for (const [stock,risk,status] of [[10,2,'available'],[2,2,'warning'],[1,2,'warning'],[0,2,'missing'],[0,0,'missing'],[1,0,'available'],[10,20,'warning']]) check(stockStatus({stock,risk_quantity:risk}) === status, `Estado stock ${stock}, riesgo ${risk}`);
+check(isMutation({type:'risk',product_id:product.id,quantity:2,version:1}), 'Límite pendiente válido');
+check(!isMutation({type:'risk',product_id:product.id,quantity:-1,version:1}), 'Rechaza límite negativo');
+check(!isMutation({type:'risk',product_id:product.id,quantity:1.5,version:1}), 'Rechaza límite fraccionario');
+check(!isMutation({type:'risk',product_id:product.id,quantity:2,version:null}), 'Límite exige versión');
+check(!isMutation({type:'product',operation_id:operation,product:{category_id:category.id,name:'Papel',description:'',icon_id:'paper',stock:0,risk_quantity:-1}}), 'Alta rechaza límite negativo');
 console.log(`Inventario: ${passed} comprobaciones de búsqueda, cantidades y reintentos correctas.`);

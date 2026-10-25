@@ -74,3 +74,9 @@ La fase 5 permitirá compartir una URL HTTPS e instalar la web en el celular. Al
 El canal escucha también DELETE de categorías para que quitar una vacía se refleje sin esperar al sondeo de 30 segundos. Realtime no admite filtro de hogar para DELETE: el evento se usa únicamente como aviso para volver a consultar, sin leer ni mostrar su contenido. La lectura posterior conserva el filtro del hogar y RLS. El traslado de productos también genera los eventos UPDATE ya existentes. En reconexión se recupera el estado actual.
 
 La prueba remota se amplió a 13 comprobaciones: en cinco sesiones independientes se verifican también la eliminación vacía, el traslado sin cambiar cantidades/versiones y la conservación del historial. La ejecución de esta mejora midió 666, 567 y 490 ms para las tres muestras de cambio de stock; no constituye una garantía de latencia. Los datos y cuentas temporales se eliminaron al terminar.
+
+## Extensión: límites y estados de reposición (25 de octubre de 2026)
+
+Los cambios de `risk_quantity` generan UPDATE de productos y utilizan la suscripción existente. Los contadores y estados se calculan a partir del stock y límite confirmados por el servidor. No se agrega una caché privada ni escritura offline.
+
+La prueba Realtime ahora tiene 15 comprobaciones y verifica en cinco sesiones el cambio de límite al stock actual (Por agotarse), stock cero (Por comprar) y reposición por encima del límite, incluida una reconexión. Las muestras de esta entrega fueron 808, 752 y 1.186 ms para escritura/evento/lectura; no son un SLA.

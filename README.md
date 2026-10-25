@@ -10,6 +10,7 @@ Base de una aplicación móvil web para compartir el inventario del hogar.
 - [Fase 1: aplicar SQL, probar y crear el hogar](Docs/Fase_1_SQL.md)
 - [Fase 2: uso de cuentas, invitaciones y apariencia](Docs/Fase_2_Cuentas.md)
 - [Fase 3: inventario, cantidades, historial y pruebas](Docs/Fase_3_Inventario.md)
+- [Módulo Reposición y cantidad en riesgo](Docs/PR_Stock_En_Riesgo.md)
 - [Mejora: quitar categorías sin perder productos](Docs/PR_Quitar_Categorias.md)
 - [Fase 4: sincronización, recuperación y pruebas](Docs/Fase_4_Sincronizacion.md)
 - [Fase 5: instalar, publicar, actualizar y probar en celulares](Docs/Fase_5_PWA_Publicacion.md)

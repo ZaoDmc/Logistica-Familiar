@@ -110,7 +110,7 @@ Para una revisión visual aislada, `npm.cmd run inventory:qa` prepara hogares y 
 
 ## Pendientes de las siguientes fases
 
-Fase 4: recibir cambios automáticamente entre dispositivos, recuperar estado al volver a la aplicación y probar cortes reales de red. Fase 5: publicación HTTPS y PWA instalable. La edición de categorías y el borrado de productos, el stock mínimo configurable y las notificaciones push continúan fuera de este alcance. Quitar categorías se añadió en la mejora del 23 de octubre de 2026, descrita abajo.
+Fase 4: recibir cambios automáticamente entre dispositivos, recuperar estado al volver a la aplicación y probar cortes reales de red. Fase 5: publicación HTTPS y PWA instalable. La edición de categorías y el borrado de productos, las notificaciones push continúan fuera de este alcance. La cantidad en riesgo configurable se añadió el 25 de octubre de 2026. Quitar categorías se añadió en la mejora del 23 de octubre de 2026, descrita abajo.
 
 ## Mejora del 23 de octubre de 2026: quitar categorías
 
@@ -121,3 +121,21 @@ La función SQL `remove_category` aplica traslado y eliminación en una transacc
 La migración `202610230001_remove_category.sql` debe aplicarse antes de publicar la interfaz: `npm.cmd run db:migrate`. Las tablas no conceden borrado directo al navegador. La operación usa el mismo bloqueo de interfaz, recuperación de errores y reintentos pendientes que el resto del inventario. Un filtro que apuntaba a una categoría retirada vuelve automáticamente a todas las categorías.
 
 Validación adicional: 15 pruebas SQL locales y en Supabase para permisos, destinos ajenos, conservación de stock/historial, reintento y categorías vacías; 28 comprobaciones del modelo; 22 de sincronización. Se revisó la confirmación, selección de destino y cancelación como integrante temporal en claro/oscuro a 360 px, sin desbordamiento horizontal. No se usó el hogar familiar.
+
+## Mejora del 25 de octubre de 2026: cantidad en riesgo y Reposición
+
+Cada alta de producto incluye una cantidad en riesgo, entera entre 0 y 1.000.000, en la misma unidad que el stock. El límite puede superar el stock actual: en ese caso el artículo ya aparece por agotarse. Los productos existentes parten con límite 0; configurar su valor desde **Editar cantidad en riesgo** en la tarjeta.
+
+| Estado | Condición | Color |
+| --- | --- | --- |
+| Por comprar | Stock = 0, cualquiera sea el límite | Rojo |
+| Por agotarse | 0 < stock <= cantidad en riesgo | Amarillo |
+| Disponible | Stock > cantidad en riesgo | Neutro |
+
+**Reposición** es el cuarto apartado del hogar junto con Productos, Movimientos e Integrantes. Reúne solo Por comprar y Por agotarse, muestra contadores separados, búsqueda por nombre/descripción/categoría y filtros de estado. Ordena primero los productos en cero. Las tarjetas permiten sumar, restar, escribir una cantidad exacta, editar el límite y ver movimientos. Al reponer por encima del límite, el producto deja la lista automáticamente; los contadores siempre reflejan todo el hogar, aunque haya búsqueda o filtro.
+
+Se comparte una instancia de inventario entre los apartados: operaciones pendientes, control de conexión y conciliación de cambios mantienen el comportamiento de la fase 4. La cantidad en riesgo usa una versión propia para detectar ediciones simultáneas sin alterar la versión ni el historial de stock. Reintentar una edición ya aplicada no la repite; un cambio posterior obliga a revisar el límite vigente.
+
+La migración `202610250001_stock_risk.sql` agrega `risk_quantity` y `risk_version`, además de `create_product_with_risk` y `set_product_risk`. Aplicarla con `npm.cmd run db:migrate` antes de publicar. La creación guarda stock, límite y movimiento inicial atómicamente. El RPC anterior sigue disponible para clientes antiguos y operaciones pendientes, con límite 0. El navegador sigue sin permisos de UPDATE directo.
+
+Validación: 23 pruebas nuevas SQL locales/remotas; 128 pruebas SQL en total. Los cambios simultáneos del límite detectan conflictos y conservan stock/historial. Modelo: 40 comprobaciones; sincronización: 22; PWA: 44. Prueba móvil como integrante temporal: alta de 10 bolsas con riesgo 2, stock 2 amarillo, edición de riesgo a 3 desde Reposición, stock 0 rojo, suma a 1 amarillo y reposición a 4 retirando la tarjeta. Las pruebas físicas en teléfonos familiares siguen pendientes.

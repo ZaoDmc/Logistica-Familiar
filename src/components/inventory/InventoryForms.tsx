@@ -16,15 +16,18 @@ export function InventoryForm({ kind, categories, disabled, mutate, onClose }: {
   const [name, setName] = useState(''), [description, setDescription] = useState('');
   const [icon, setIcon] = useState<ProductIconId>('other'), [category, setCategory] = useState(categories[0]?.id || '');
   const [stock, setStock] = useState('0'), [error, setError] = useState('');
+  const [risk, setRisk] = useState('0');
   async function save(event: FormEvent) {
     event.preventDefault(); if (disabled) return;
     if (!name.trim()) { setError('Escribe un nombre para continuar.'); return; }
     const quantity = parseStock(stock);
+    const riskQuantity = parseStock(risk);
     if (kind === 'product' && (quantity === null || !categories.some(item => item.id === category))) { setError('Revisa la categoría y la cantidad inicial.'); return; }
+    if (kind === 'product' && riskQuantity === null) { setError('La cantidad en riesgo debe ser un entero entre 0 y 1.000.000.'); return; }
     setError('');
     try {
       await mutate(kind === 'category' ? { type: 'category', name: name.trim(), icon_id: icon } : {
-        type: 'product', operation_id: crypto.randomUUID(), product: { category_id: category, name: name.trim(), description: description.trim(), icon_id: icon, stock: quantity! },
+        type: 'product', operation_id: crypto.randomUUID(), product: { category_id: category, name: name.trim(), description: description.trim(), icon_id: icon, stock: quantity!, risk_quantity: riskQuantity! },
       });
       onClose();
     } catch (error) { setError(error instanceof Error ? error.message : 'No pudimos guardar los datos.'); }
@@ -35,7 +38,8 @@ export function InventoryForm({ kind, categories, disabled, mutate, onClose }: {
       <label htmlFor={`${id}-name`}>Nombre {kind === 'category' ? 'de la categoría' : 'del producto'}</label><input id={`${id}-name`} autoFocus required maxLength={kind === 'category' ? 80 : 100} value={name} onChange={event => setName(event.target.value)} disabled={disabled} placeholder={kind === 'category' ? 'Por ejemplo, Mascotas' : 'Por ejemplo, Comida del Logan Cannes'} />
       {kind === 'product' && <><label htmlFor={`${id}-category`}>Categoría del producto</label><select id={`${id}-category`} value={category} onChange={event => setCategory(event.target.value)} required disabled={disabled}>{categories.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select>
         <label htmlFor={`${id}-description`}>Descripción breve <span className="optional">(opcional)</span></label><textarea id={`${id}-description`} rows={2} maxLength={240} value={description} onChange={event => setDescription(event.target.value)} disabled={disabled} placeholder="Formato, marca o algún detalle útil" /><p className="small character-count">{description.length}/240 caracteres</p>
-        <label htmlFor={`${id}-stock`}>Cantidad inicial en casa</label><input id={`${id}-stock`} type="number" inputMode="numeric" min={0} max={1000000} step={1} required value={stock} onChange={event => setStock(event.target.value)} disabled={disabled} /><p className="small">Cuenta unidades, envases o paquetes completos. Cero indica que hace falta comprar.</p></>}
+        <label htmlFor={`${id}-stock`}>Cantidad inicial en casa</label><input id={`${id}-stock`} type="number" inputMode="numeric" min={0} max={1000000} step={1} required value={stock} onChange={event => setStock(event.target.value)} disabled={disabled} /><p className="small">Cuenta unidades, envases o paquetes completos. Cero indica que hace falta comprar.</p>
+        <label htmlFor={`${id}-risk`}>Cantidad en riesgo</label><input id={`${id}-risk`} type="number" inputMode="numeric" min={0} max={1000000} step={1} required value={risk} onChange={event => setRisk(event.target.value)} disabled={disabled} aria-describedby={`${id}-risk-help`} /><p className="small" id={`${id}-risk-help`}>Por ejemplo, 2: con 2 o 1 queda «Por agotarse» en amarillo; con 0, «Por comprar» en rojo. Usa la misma unidad que el stock.</p></>}
       <IconPicker value={icon} onChange={setIcon} disabled={disabled} />
       {error && <p className="alert error" role="alert">{error}</p>}
       <button className="primary" disabled={disabled}>{disabled ? 'Guardando…' : kind === 'category' ? 'Guardar categoría' : 'Agregar producto al hogar'}</button>

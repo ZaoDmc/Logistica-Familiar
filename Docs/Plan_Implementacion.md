@@ -14,7 +14,7 @@ Flujo previsto:
 2. Cada persona entra con su propia cuenta y ve los productos del hogar agrupados por categoría.
 3. Un toque en + o − envía una operación al servidor. Una transacción actualiza el stock y escribe el historial.
 4. Los demás clientes reciben el evento autorizado y consultan el estado actualizado. Al reconectarse recuperan los cambios perdidos.
-5. La vista «Por comprar» muestra inicialmente productos con stock cero. Un umbral mínimo será una mejora opcional.
+5. La vista «Por comprar» muestra productos con stock cero. Desde el 25 de octubre de 2026 cada producto tiene una cantidad en riesgo configurable y el apartado Reposición reúne Por comprar y Por agotarse.
 
 ## Alojamiento
 

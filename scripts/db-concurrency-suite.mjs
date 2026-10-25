@@ -66,7 +66,26 @@ export async function runConcurrencyTests(pool) {
     assert.equal(integrity.total, 0, 'Suma de historial coincide con stock final');
     assert.equal(integrity.movements, Number((await current()).version), 'Cada versión tiene un movimiento');
     assert.equal(integrity.versions, integrity.movements, 'No hay versiones duplicadas');
+    const riskChange = async quantity => {
+      const client = await pool.connect();
+      try {
+        await client.query('begin'); await client.query('set local role authenticated');
+        await client.query("select set_config('request.jwt.claim.sub',$1,true)", [actor]);
+        await client.query('select public.set_product_risk($1,$2,1)', [product,quantity]);
+        await client.query('commit');
+      } catch(error) { await client.query('rollback'); throw error; }
+      finally { client.release(); }
+    };
+    const limits = await Promise.allSettled([riskChange(2),riskChange(3)]);
+    assert.equal(limits.filter(result => result.status === 'fulfilled').length,1,'Solo un límite gana con la misma versión');
+    assert.ok(limits.some(result => result.status === 'rejected' && result.reason.code === 'PT412'),'El otro límite detecta conflicto');
+    const risk = (await pool.query('select stock,version,risk_quantity,risk_version from public.products where id=$1',[product])).rows[0];
+    await riskChange(risk.risk_quantity);
+    assert.equal(Number((await pool.query('select risk_version from public.products where id=$1',[product])).rows[0].risk_version),2,'Reintentar ganador no incrementa versión');
+    assert.equal(risk.stock,0,'Competir por el límite conserva stock');
+    assert.equal(Number(risk.version),integrity.movements,'Versión de stock sigue coincidiendo con historial');
     console.log('Concurrencia: incrementos, reintentos, casilla y decrementos correctos con hasta cinco sesiones.');
+    console.log('Concurrencia de riesgo: conflicto de versiones y reintento correctos, sin alterar stock.');
   } finally {
     if (created) {
       const cleanup = await pool.connect();

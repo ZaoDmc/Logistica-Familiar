@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type FormEvent } from 'react';
 import { productIcons } from '../../catalogs/icons';
-import { parseStock, type Product, type Mutation } from '../../lib/inventory-model';
+import { parseStock, stockStatus, type Product, type Mutation } from '../../lib/inventory-model';
+import { ProductRisk } from './ProductRisk';
 
 export function ProductCard({ product, disabled, mutate, showHistory }: {
   product: Product; disabled: boolean; mutate: (intent: Mutation) => Promise<void>; showHistory: () => void;
@@ -28,9 +29,10 @@ export function ProductCard({ product, disabled, mutate, showHistory }: {
   }
   function reset() { setDraft(String(product.stock)); setVersion(product.version); setEditing(false); setError(''); }
   const icon = productIcons.find(icon => icon.id === product.icon_id) || productIcons[productIcons.length - 1];
+  const status = stockStatus(product);
   return <article className="product-card" aria-labelledby={`${id}-title`}>
     <div className="product-heading"><span className="product-icon" aria-hidden="true">{icon.symbol}</span><div><h3 id={`${id}-title`}>{product.name}</h3>{product.description && <p>{product.description}</p>}</div></div>
-    <div className="stock-heading"><span className={product.stock === 0 ? 'stock-status missing' : 'stock-status'}>{product.stock === 0 ? 'Por comprar' : 'Disponible'}</span><span className="small">Unidades en casa</span></div>
+    <div className="stock-heading"><span className={`stock-status ${status}`}>{status === 'missing' ? 'Por comprar' : status === 'warning' ? 'Por agotarse' : 'Disponible'}</span><span className="small">Unidades en casa</span></div>
     <form onSubmit={save} className="stock-form">
       <div className="stock-control"><button type="button" className="quantity-button" aria-label={`Restar una unidad de ${product.name}`} disabled={disabled || dirty || product.stock === 0} onClick={() => void change('delta', -1)}>−</button>
         <label className="sr-only" htmlFor={`${id}-quantity`}>Cantidad de {product.name}</label><input id={`${id}-quantity`} type="number" inputMode="numeric" min={0} max={1000000} step={1} required value={draft} onChange={event => { if (!editing) setVersion(product.version); setEditing(true); setDraft(event.target.value); setError(''); }} disabled={disabled} />
@@ -38,6 +40,7 @@ export function ProductCard({ product, disabled, mutate, showHistory }: {
       {dirty && <div className="quantity-confirm">{changed && <p className="small" role="status">La cantidad cambió. Ahora hay {product.stock} en casa; revisa el valor antes de guardar.</p>}<button className="primary compact" disabled={disabled || changed}>Guardar cantidad</button><button type="button" className="text-button" onClick={reset} disabled={disabled}>Usar cantidad actual</button></div>}
     </form>
     {error && <p className="alert error" role="alert">{error}</p>}
+    <ProductRisk product={product} disabled={disabled || dirty} mutate={mutate} />
     <button className="text-button product-history" onClick={showHistory}>Ver movimientos<span className="sr-only"> de {product.name}</span></button>
   </article>;
 }

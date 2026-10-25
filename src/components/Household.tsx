@@ -11,7 +11,7 @@ export function Household({ id, name, userId }: { id: string; name: string; user
   const [busy, setBusy] = useState(false), [link, setLink] = useState(''), [linkKind, setLinkKind] = useState('');
   const [personName, setPersonName] = useState(''), [email, setEmail] = useState('');
   const [copied, setCopied] = useState(false);
-  const [view, setView] = useState<'products' | 'history' | 'members'>('products');
+  const [view, setView] = useState<'products' | 'restock' | 'history' | 'members'>('products');
   const [historyProduct, setHistoryProduct] = useState('');
   const operation = useRef<string | null>(null);
   const admin = members.find(member => member.user_id === userId)?.role === 'admin';
@@ -49,7 +49,7 @@ export function Household({ id, name, userId }: { id: string; name: string; user
   if (loading) return <section className="card" role="status">Cargando tu hogar…</section>;
   return <div className="dashboard">
     <section className="home-summary"><p className="eyebrow">NUESTRO ESPACIO COMPARTIDO</p><h1>{name}</h1><p>{members.length} {members.length === 1 ? 'persona cuidando' : 'personas cuidando'} lo cotidiano.</p><span className="badge">{admin ? 'Admin' : 'Integrante'}</span></section>
-    <nav className="household-nav" aria-label="Secciones del hogar"><button aria-pressed={view === 'products'} onClick={() => setView('products')}>Productos</button><button aria-pressed={view === 'history'} onClick={() => { setHistoryProduct(''); setView('history'); }}>Movimientos</button><button aria-pressed={view === 'members'} onClick={() => setView('members')}>Integrantes</button></nav>
+    <nav className="household-nav" aria-label="Secciones del hogar"><button aria-pressed={view === 'products'} onClick={() => setView('products')}>Productos</button><button aria-pressed={view === 'restock'} onClick={() => setView('restock')}>Reposición</button><button aria-pressed={view === 'history'} onClick={() => { setHistoryProduct(''); setView('history'); }}>Movimientos</button><button aria-pressed={view === 'members'} onClick={() => setView('members')}>Integrantes</button></nav>
     <Inventory home={id} userId={userId} view={view} historyProduct={historyProduct} setHistoryProduct={setHistoryProduct} showHistory={product => { setHistoryProduct(product); setView('history'); }} />
     <div hidden={view !== 'members'}>
     {error && <div className="alert error" role="alert">{error}<button className="text-button" disabled={busy} onClick={() => void reload().catch(error => setError(error.message))}>Reintentar</button></div>}

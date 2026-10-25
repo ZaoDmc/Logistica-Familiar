@@ -1,12 +1,14 @@
 import type { ProductIconId } from '../catalogs/icons';
 
 export type Category = { id: string; name: string; icon_id: ProductIconId };
-export type Product = { id: string; category_id: string; name: string; description: string; icon_id: ProductIconId; stock: number; version: number | string };
+export type Product = { id: string; category_id: string; name: string; description: string; icon_id: ProductIconId; stock: number; version: number | string; risk_quantity: number; risk_version: number | string };
 export type Movement = { id: string; product_id: string; actor_name: string; product_name: string; kind: 'initial' | 'delta' | 'set'; previous_stock: number; new_stock: number; delta: number; created_at: string; product_version: number | string };
-export type NewProduct = { category_id: string; name: string; description: string; icon_id: ProductIconId; stock: number };
+// Solo los reintentos guardados por versiones anteriores pueden omitir el umbral.
+export type NewProduct = { category_id: string; name: string; description: string; icon_id: ProductIconId; stock: number; risk_quantity?: number };
 export type Mutation =
   | { type: 'category'; name: string; icon_id: ProductIconId }
   | { type: 'remove-category'; category_id: string; destination_id: string | null }
+  | { type: 'risk'; product_id: string; quantity: number; version: number | string }
   | { type: 'product'; operation_id: string; product: NewProduct }
   | { type: 'stock'; operation_id: string; product_id: string; kind: 'delta' | 'set'; quantity: number; version: number | string | null };
 
@@ -17,6 +19,10 @@ export function parseStock(value: string): number | null {
 }
 export function normalizeSearch(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
+}
+export function stockStatus(product: Pick<Product, 'stock' | 'risk_quantity'>): 'missing' | 'warning' | 'available' {
+  if (product.stock === 0) return 'missing';
+  return product.stock <= product.risk_quantity ? 'warning' : 'available';
 }
 export function filterProducts(products: Product[], categories: Category[], search: string, category: string, buying: boolean) {
   const words = normalizeSearch(search).split(/\s+/).filter(Boolean);
@@ -33,6 +39,7 @@ export function isMutation(value: unknown): value is Mutation {
   const icon = (value: unknown) => ['food', 'dairy', 'produce', 'cleaning', 'pet', 'paper', 'hygiene', 'other'].includes(String(value));
   if (item.type === 'category') return typeof item.name === 'string' && item.name.trim().length > 0 && item.name.length <= 80 && icon(item.icon_id);
   if (item.type === 'remove-category') return uuid(item.category_id) && (item.destination_id === null || (uuid(item.destination_id) && item.destination_id !== item.category_id));
+  if (item.type === 'risk') return uuid(item.product_id) && typeof item.quantity === 'number' && parseStock(String(item.quantity)) !== null && /^\d+$/.test(String(item.version)) && Number(item.version) > 0;
   if (!uuid(item.operation_id)) return false;
   if (item.type === 'stock') return uuid(item.product_id) && typeof item.quantity === 'number' && Number.isSafeInteger(item.quantity)
     && ((item.kind === 'delta' && [1, -1].includes(item.quantity) && item.version === null)
@@ -41,5 +48,6 @@ export function isMutation(value: unknown): value is Mutation {
   const product = item.product as Record<string, unknown>;
   return uuid(product.category_id) && typeof product.name === 'string' && product.name.trim().length > 0 && product.name.length <= 100
     && typeof product.description === 'string' && product.description.length <= 240 && icon(product.icon_id)
-    && typeof product.stock === 'number' && parseStock(String(product.stock)) !== null;
+    && typeof product.stock === 'number' && parseStock(String(product.stock)) !== null
+    && (product.risk_quantity === undefined || (typeof product.risk_quantity === 'number' && parseStock(String(product.risk_quantity)) !== null));
 }

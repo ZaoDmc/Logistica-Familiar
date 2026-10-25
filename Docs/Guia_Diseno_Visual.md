@@ -37,7 +37,7 @@ Los componentes deben usar variables semánticas CSS, por ejemplo `var(--brand)`
 
 Sombras: `0 18px 50px #4B2B1B0D` en claro y `0 18px 50px #00000026` en oscuro. Usarlas con moderación; no agregar sombras diferentes a cada tarjeta.
 
-El rojo se reserva para errores. El terracota identifica acciones y énfasis de la aplicación; **Por comprar** mantiene una etiqueta escrita. Los bordes decorativos pueden ser suaves; los campos usan el borde de control más visible.
+El rojo identifica errores y el estado Por comprar (stock cero). El terracota identifica acciones y énfasis de la aplicación; **Por comprar** y **Por agotarse** mantienen etiquetas escritas además de sus colores. Los bordes decorativos pueden ser suaves; los campos usan el borde de control más visible.
 
 Para cambiar la identidad principal de nuevo, revisar conjuntamente:
 
@@ -152,3 +152,18 @@ El selector de tema es una cápsula con dos botones: sol / Claro y luna / Oscuro
 ## Quitar categorías
 
 Cada encabezado de categoría incluye una acción de texto **Quitar categoría**, con nombre accesible que incluye la categoría y altura mínima de 44 px. El encabezado permite saltar de línea cuando falta espacio. La confirmación aparece dentro de la sección usando la tarjeta habitual, altura automática y borde de control. Cancelar y confirmar quedan separados por 10 px y pueden ocupar líneas distintas en celular. Si hay productos, el selector de destino es obligatorio; no habilitar la confirmación hasta elegir un destino válido.
+
+## Reposición y estados de stock
+
+El amarillo se reserva para **Por agotarse** (stock positivo igual o menor al límite); el rojo señala **Por comprar** (stock cero). El resto sigue como Disponible. Usar estas variables semánticas:
+
+| Variable / combinación | Claro | Oscuro |
+| --- | --- | --- |
+| `--warning-bg` | `#FFF0BD` | `#4A390D` |
+| `--warning-text` | `#694B00` | `#FFE18A` |
+| `--warning-border` | `#A47B0D` | `#B99A3D` |
+| Por comprar | `--error` / `--error-bg` | `--error` / `--error-bg` |
+| Contraste texto amarillo / fondo | 7,08:1 | 8,71:1 |
+| Contraste texto rojo / fondo | 6,44:1 | 7,82:1 |
+
+Los contadores de Reposición usan dos columnas con gap de 12 px, padding 18 × 14 px y radio de 18 px. La etiqueta de estado de cada producto usa el mismo esquema y borde de 1 px. Las tarjetas mantienen altura automática, controles de stock de 48 px y edición de límite plegable. La navegación del hogar usa cuatro columnas en escritorio y dos columnas hasta 600 px para mantener los nombres legibles. Evitar mostrar información técnica de versiones al usuario: los mensajes deben pedir revisar el valor actual.
