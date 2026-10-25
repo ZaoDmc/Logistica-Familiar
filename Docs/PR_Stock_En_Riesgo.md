@@ -16,3 +16,5 @@ La migración `202610250001_stock_risk.sql` debe aplicarse antes del despliegue.
 - Se usaron hogares sintéticos; no se cambió el stock del hogar familiar. La migración solo incorpora los nuevos campos con límite inicial 0.
 
 Guías de fases 3/4, plan, README y guía visual actualizados. Las pruebas en los teléfonos familiares siguen pendientes.
+
+Publicación verificada el 25 de octubre de 2026 en https://logistica-familiar.vercel.app/, estado READY. Pasaron las 55 comprobaciones remotas de integridad, cabeceras, Auth y CORS. Los hogares y cuentas temporales se eliminaron. Rama: codex/stock-en-riesgo. Commit de implementación: fe59634.
