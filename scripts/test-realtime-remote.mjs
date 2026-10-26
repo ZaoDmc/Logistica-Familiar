@@ -21,15 +21,16 @@ try {
   const outsider = await loginFixture(fixture.users[2]); clients.push(outsider);
   const versions = Array(5).fill(0), events = Array(5).fill(0), categories = Array(5).fill(0), histories = Array(5).fill(0), ready = Array(5).fill(false);
   const states = Array(5).fill(''), riskVersions = Array(5).fill(0);
+  const activeCounts = Array(5).fill(0);
   let product, forbidden = 0;
   for (let index = 0; index < 5; index++) {
     stops.push(watchInventory(clients[index], fixture.home, () => {
       events[index]++;
       void Promise.all([
-        clients[index].from('products').select('version,stock,risk_quantity,risk_version').eq('household_id', fixture.home),
+        clients[index].from('products').select('version,stock,risk_quantity,risk_version').eq('household_id', fixture.home).is('deleted_at',null),
         clients[index].from('categories').select('id').eq('household_id', fixture.home),
         clients[index].from('stock_movements').select('id').eq('household_id', fixture.home),
-      ]).then(([p,c,h]) => { versions[index] = Math.max(0,...(p.data || []).map(row => Number(row.version))); categories[index] = c.data?.length || 0; histories[index] = h.data?.length || 0; if(p.data?.[0]) {states[index]=stockStatus(p.data[0]);riskVersions[index]=Number(p.data[0].risk_version);} });
+      ]).then(([p,c,h]) => { activeCounts[index] = p.data?.length || 0; versions[index] = Math.max(0,...(p.data || []).map(row => Number(row.version))); categories[index] = c.data?.length || 0; histories[index] = h.data?.length || 0; if(p.data?.[0]) {states[index]=stockStatus(p.data[0]);riskVersions[index]=Number(p.data[0].risk_version);} });
     }, status => { ready[index] = status === 'live'; console.log(`Sesión ${index + 1}: ${status}`); }));
   }
   let outsiderReady = false;
@@ -71,8 +72,12 @@ try {
   await wait(() => versions[0] === 9 && states[0] === 'available', 'Repuesto sale de alertas con una sesión desconectada');
   check(events[4] === before, 'Suscripción liberada no recibe cambios');
   let recovered = false;
-  stops[4] = watchInventory(clients[4], fixture.home, () => { void clients[4].from('products').select('version,stock,risk_quantity').eq('id',product).single().then(({data}) => { recovered = Number(data?.version) === 9 && stockStatus(data) === 'available'; }); }, () => {});
+  stops[4] = watchInventory(clients[4], fixture.home, () => { void clients[4].from('products').select('version,stock,risk_quantity').eq('id',product).is('deleted_at',null).maybeSingle().then(({data}) => { activeCounts[4] = data ? 1 : 0; recovered = Number(data?.version) === 9 && stockStatus(data) === 'available'; }); }, () => {});
   await wait(() => recovered, 'Reconciliación después de reconectar'); check(recovered, 'Recupera cambios perdidos al suscribirse de nuevo');
+  await ok(clients[1].rpc('remove_product',{p_product_id:product}));
+  await wait(() => activeCounts.every(count => count === 0),'Eliminar producto reflejado en cinco sesiones');
+  check(true,'Producto eliminado desaparece del inventario activo en cinco sesiones');
+  check((await ok(clients[0].from('stock_movements').select('id').eq('product_id',product))).length === 9,'Historial permanece tras eliminación sincronizada');
   check(forbidden === 0, 'RLS impide notificaciones a un usuario ajeno');
   check((await ok(outsider.from('products').select('id').eq('household_id',fixture.home))).length === 0, 'Reconsulta ajena tampoco obtiene datos');
   await outsider.removeChannel(foreignChannel);

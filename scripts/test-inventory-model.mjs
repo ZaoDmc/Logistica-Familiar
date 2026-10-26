@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { parseStock, filterProducts, isMutation, stockStatus } from '../src/lib/inventory-model.ts';
+import { parseStock, filterProducts, isMutation, stockStatus, minimumToBuy } from '../src/lib/inventory-model.ts';
 let passed = 0;
 const check = (condition, label) => { assert.ok(condition, label); passed++; };
 for (const [input, expected] of [['0',0], [' 12 ',12], ['0002',2], ['1000000',1000000], ['',null], [' ',null], ['-1',null], ['1.5',null], ['1e2',null], ['+1',null], ['1000001',null], ['Infinity',null]]) check(parseStock(input) === expected, `Cantidad: ${input}`);
@@ -29,4 +29,7 @@ check(!isMutation({type:'risk',product_id:product.id,quantity:-1,version:1}), 'R
 check(!isMutation({type:'risk',product_id:product.id,quantity:1.5,version:1}), 'Rechaza límite fraccionario');
 check(!isMutation({type:'risk',product_id:product.id,quantity:2,version:null}), 'Límite exige versión');
 check(!isMutation({type:'product',operation_id:operation,product:{category_id:category.id,name:'Papel',description:'',icon_id:'paper',stock:0,risk_quantity:-1}}), 'Alta rechaza límite negativo');
+for(const [stock,risk,expected] of [[4,12,9],[0,12,13],[12,12,1],[13,12,0],[20,12,0],[0,0,1],[1,0,0],[0,1000000,1000001]]) check(minimumToBuy({stock,risk_quantity:risk}) === expected,`Compra mínima con stock ${stock} y riesgo ${risk}`);
+check(isMutation({type:'remove-product',product_id:product.id}),'Eliminación pendiente válida');
+check(!isMutation({type:'remove-product',product_id:'alterado'}),'Rechaza eliminación pendiente alterada');
 console.log(`Inventario: ${passed} comprobaciones de búsqueda, cantidades y reintentos correctas.`);

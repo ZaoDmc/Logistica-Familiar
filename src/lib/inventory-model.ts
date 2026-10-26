@@ -8,6 +8,7 @@ export type NewProduct = { category_id: string; name: string; description: strin
 export type Mutation =
   | { type: 'category'; name: string; icon_id: ProductIconId }
   | { type: 'remove-category'; category_id: string; destination_id: string | null }
+  | { type: 'remove-product'; product_id: string }
   | { type: 'risk'; product_id: string; quantity: number; version: number | string }
   | { type: 'product'; operation_id: string; product: NewProduct }
   | { type: 'stock'; operation_id: string; product_id: string; kind: 'delta' | 'set'; quantity: number; version: number | string | null };
@@ -24,6 +25,9 @@ export function stockStatus(product: Pick<Product, 'stock' | 'risk_quantity'>): 
   if (product.stock === 0) return 'missing';
   return product.stock <= product.risk_quantity ? 'warning' : 'available';
 }
+export function minimumToBuy(product: Pick<Product, 'stock' | 'risk_quantity'>): number {
+  return Math.max(0, product.risk_quantity + 1 - product.stock);
+}
 export function filterProducts(products: Product[], categories: Category[], search: string, category: string, buying: boolean) {
   const words = normalizeSearch(search).split(/\s+/).filter(Boolean);
   const categoryNames = new Map(categories.map(category => [category.id, category.name]));
@@ -39,6 +43,7 @@ export function isMutation(value: unknown): value is Mutation {
   const icon = (value: unknown) => ['food', 'dairy', 'produce', 'cleaning', 'pet', 'paper', 'hygiene', 'other'].includes(String(value));
   if (item.type === 'category') return typeof item.name === 'string' && item.name.trim().length > 0 && item.name.length <= 80 && icon(item.icon_id);
   if (item.type === 'remove-category') return uuid(item.category_id) && (item.destination_id === null || (uuid(item.destination_id) && item.destination_id !== item.category_id));
+  if (item.type === 'remove-product') return uuid(item.product_id);
   if (item.type === 'risk') return uuid(item.product_id) && typeof item.quantity === 'number' && parseStock(String(item.quantity)) !== null && /^\d+$/.test(String(item.version)) && Number(item.version) > 0;
   if (!uuid(item.operation_id)) return false;
   if (item.type === 'stock') return uuid(item.product_id) && typeof item.quantity === 'number' && Number.isSafeInteger(item.quantity)

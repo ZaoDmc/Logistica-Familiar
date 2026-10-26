@@ -80,3 +80,9 @@ La prueba remota se amplió a 13 comprobaciones: en cinco sesiones independiente
 Los cambios de `risk_quantity` generan UPDATE de productos y utilizan la suscripción existente. Los contadores y estados se calculan a partir del stock y límite confirmados por el servidor. No se agrega una caché privada ni escritura offline.
 
 La prueba Realtime ahora tiene 15 comprobaciones y verifica en cinco sesiones el cambio de límite al stock actual (Por agotarse), stock cero (Por comprar) y reposición por encima del límite, incluida una reconexión. Las muestras de esta entrega fueron 808, 752 y 1.186 ms para escritura/evento/lectura; no son un SLA.
+
+## Extensión: baja de productos (26 de octubre de 2026)
+
+La eliminación lógica produce un UPDATE en productos, por lo que utiliza la suscripción existente con filtro de hogar. Al recibirlo, la lectura del inventario excluye los productos con `deleted_at` y recalcula contadores y compra mínima. No es necesario añadir otro evento DELETE global.
+
+La prueba real se amplió a 17 comprobaciones: cinco sesiones dejan de mostrar el producto y su historial se conserva. Las muestras de stock fueron 880, 686 y 826 ms para escritura/evento/lectura, sin constituir una garantía de latencia. Se comprobó también la serialización SQL entre eliminar y cambiar stock: una escritura confirma antes de la baja o es rechazada después, sin dejar stock e historial desajustados.

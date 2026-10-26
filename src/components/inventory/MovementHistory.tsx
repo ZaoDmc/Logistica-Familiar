@@ -29,7 +29,7 @@ export function MovementHistory({ home, products, product, setProduct, revision,
   }
   return <section className="card history-section" aria-labelledby="history-title">
     <h2 id="history-title">Lo que cambió en casa</h2><p className="small">Cada cantidad confirmada conserva quién la cambió y cuándo.</p>
-    <label htmlFor="history-product">Movimientos de</label><select id="history-product" value={product} onChange={event => setProduct(event.target.value)}><option value="">Todo el hogar</option>{[...products].sort((a, b) => a.name.localeCompare(b.name, 'es')).map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>
+    <label htmlFor="history-product">Movimientos de</label><select id="history-product" value={product} onChange={event => setProduct(event.target.value)}><option value="">Todo el hogar</option>{product && !products.some(item => item.id === product) && <option value={product}>Producto eliminado · {rows.find(row => row.product_id === product)?.product_name || 'Historial'}</option>}{[...products].sort((a, b) => a.name.localeCompare(b.name, 'es')).map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>
     {error && <p className="alert error" role="alert">{error}</p>}
     {!loading && !rows.length && !error && <p className="empty-copy">Todavía no hay movimientos para esta selección.</p>}
     <ol className="movement-list">{rows.map(row => <li key={row.id}>

@@ -12,6 +12,7 @@ export function inventoryError(error: unknown): InventoryError {
     '40001': 'La cantidad cambió en otra sesión. Revisa el stock actual antes de guardar.',
     'PT409': 'La cantidad cambió en otra sesión. Revisa el stock actual antes de guardar.',
     'PT412': 'La cantidad en riesgo cambió en otra sesión. Revisa el valor actual antes de guardar.',
+    'PT410': 'Este producto fue eliminado. Actualiza el inventario para continuar.',
     '23514': 'La cantidad debe ser un entero entre 0 y 1.000.000.',
     '23505': 'Ya existe una categoría con ese nombre en el hogar.',
     '42501': 'Ya no tienes acceso a esta operación. Actualiza o vuelve a iniciar sesión.',
@@ -24,13 +25,14 @@ export function inventoryError(error: unknown): InventoryError {
   return new InventoryError(code, messages[code] || 'No pudimos confirmar la operación. Revisa tu conexión.');
 }
 export function isDefiniteError(error: InventoryError) {
-  return ['40001', 'PT409', 'PT412', '23514', '23505', '42501', '23503', '23502', '22023', 'PGRST301', 'P0001'].includes(error.code);
+  return ['40001', 'PT409', 'PT412', 'PT410', '23514', '23505', '42501', '23503', '23502', '22023', 'PGRST301', 'P0001'].includes(error.code);
 }
 function client() { if (!supabase) throw new InventoryError('CONFIG', 'Falta la conexión al hogar.'); return supabase; }
 async function allRows<T extends { id: string }>(table: string, fields: string, home: string): Promise<T[]> {
   const rows: T[] = []; let after = '';
   while (true) {
     let query = client().from(table).select(fields).eq('household_id', home).order('id').limit(500);
+    if (table === 'products') query = query.is('deleted_at', null);
     if (after) query = query.gt('id', after);
     const { data, error } = await query.abortSignal(AbortSignal.timeout(15000));
     if (error) throw inventoryError(error);
@@ -55,6 +57,8 @@ export async function applyMutation(home: string, mutation: Mutation) {
     ? db.from('categories').insert({ household_id: home, name: mutation.name.trim(), icon_id: mutation.icon_id }).select('id').abortSignal(signal).single()
     : mutation.type === 'remove-category'
       ? db.rpc('remove_category', { p_household_id: home, p_category_id: mutation.category_id, p_destination_id: mutation.destination_id }).abortSignal(signal)
+    : mutation.type === 'remove-product'
+      ? db.rpc('remove_product', { p_product_id: mutation.product_id }).abortSignal(signal)
     : mutation.type === 'risk'
       ? db.rpc('set_product_risk', { p_product_id: mutation.product_id, p_risk_quantity: mutation.quantity, p_expected_version: mutation.version }).abortSignal(signal)
     : mutation.type === 'product'

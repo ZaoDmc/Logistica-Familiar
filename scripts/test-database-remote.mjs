@@ -4,6 +4,7 @@ import { runConcurrencyTests } from './db-concurrency-suite.mjs';
 import { runAccountDatabaseTests } from './db-accounts-suite.mjs';
 import { runCategoryDatabaseTests } from './db-category-suite.mjs';
 import { runRiskDatabaseTests } from './db-risk-suite.mjs';
+import { runRemoveProductTests } from './db-remove-product-suite.mjs';
 
 let pool;
 try {
@@ -14,6 +15,7 @@ try {
     await runAccountDatabaseTests((sql, params) => client.query(sql, params));
     await runCategoryDatabaseTests((sql, params) => client.query(sql, params));
     await runRiskDatabaseTests((sql, params) => client.query(sql, params));
+    await runRemoveProductTests((sql, params) => client.query(sql, params));
   }
   finally { client.release(); }
   await runConcurrencyTests(pool);

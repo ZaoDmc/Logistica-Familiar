@@ -4,6 +4,7 @@ import { runDatabaseTests } from './db-test-suite.mjs';
 import { runAccountDatabaseTests } from './db-accounts-suite.mjs';
 import { runCategoryDatabaseTests } from './db-category-suite.mjs';
 import { runRiskDatabaseTests } from './db-risk-suite.mjs';
+import { runRemoveProductTests } from './db-remove-product-suite.mjs';
 
 const db = new PGlite();
 try {
@@ -26,6 +27,7 @@ try {
   await runAccountDatabaseTests((sql, params) => db.query(sql, params));
   await runCategoryDatabaseTests((sql, params) => db.query(sql, params));
   await runRiskDatabaseTests((sql, params) => db.query(sql, params));
+  await runRemoveProductTests((sql, params) => db.query(sql, params));
 } finally {
   await db.close();
 }

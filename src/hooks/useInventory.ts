@@ -71,7 +71,7 @@ export function useInventory(home: string, userId: string) {
     try {
       await applyMutation(home, intent);
       store(null);
-      setNotice(intent.type === 'risk' ? 'Cantidad en riesgo guardada.' : intent.type === 'remove-category' ? 'Categoría quitada. Los productos y sus cantidades se conservaron.' : intent.type === 'category' ? 'Categoría guardada.' : intent.type === 'product' ? 'Producto agregado al hogar.' : 'Cantidad guardada en el hogar.');
+      setNotice(intent.type === 'remove-product' ? 'Producto eliminado. Su historial de movimientos se conserva.' : intent.type === 'risk' ? 'Cantidad en riesgo guardada.' : intent.type === 'remove-category' ? 'Categoría quitada. Los productos y sus cantidades se conservaron.' : intent.type === 'category' ? 'Categoría guardada.' : intent.type === 'product' ? 'Producto agregado al hogar.' : 'Cantidad guardada en el hogar.');
       await refresh();
     } catch (cause) {
       const failure = inventoryError(cause);

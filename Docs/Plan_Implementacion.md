@@ -75,7 +75,7 @@ Referencias: [Auth y configuración](https://supabase.com/docs/guides/auth/gener
 | `stock_movements` | Hogar, producto, actor, stock anterior/nuevo, diferencia, fecha y clave de operación |
 | `household_invitations` | Alta pendiente, hogar, correo, autor, expiración y estado; acceso restringido |
 
-Cada entidad compartida tendrá `household_id`. Una categoría debe pertenecer al mismo hogar que su producto. El catálogo de iconos será una lista de identificadores permitidos, sin subir archivos. El historial será de solo lectura para clientes. Si posteriormente se permite eliminar productos, se archivarán para conservar el historial.
+Cada entidad compartida tendrá `household_id`. Una categoría debe pertenecer al mismo hogar que su producto. El catálogo de iconos será una lista de identificadores permitidos, sin subir archivos. El historial será de solo lectura para clientes. Desde el 26 de octubre de 2026 se permite eliminar productos mediante baja lógica para conservar el historial; Reposición calcula además la compra mínima para superar el límite de riesgo.
 
 ### Consistencia del stock
 

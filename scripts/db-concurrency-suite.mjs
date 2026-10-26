@@ -84,8 +84,24 @@ export async function runConcurrencyTests(pool) {
     assert.equal(Number((await pool.query('select risk_version from public.products where id=$1',[product])).rows[0].risk_version),2,'Reintentar ganador no incrementa versión');
     assert.equal(risk.stock,0,'Competir por el límite conserva stock');
     assert.equal(Number(risk.version),integrity.movements,'Versión de stock sigue coincidiendo con historial');
+    const remove = async () => {
+      const client = await pool.connect();
+      try {
+        await client.query('begin'); await client.query('set local role authenticated');
+        await client.query("select set_config('request.jwt.claim.sub',$1,true)",[actor]);
+        await client.query('select public.remove_product($1)',[product]); await client.query('commit');
+      } catch(error) { await client.query('rollback'); throw error; }
+      finally { client.release(); }
+    };
+    const deletion = await Promise.allSettled([remove(),change(randomUUID(),'delta',1)]);
+    assert.equal(deletion[0].status,'fulfilled','Eliminar concluye aunque compita con stock');
+    assert.ok(deletion[1].status === 'fulfilled' || deletion[1].reason.code === 'PT410','Stock confirma antes de la baja o se rechaza después');
+    const archived = (await pool.query('select stock,version,deleted_at from public.products where id=$1',[product])).rows[0];
+    const last = (await pool.query('select new_stock,product_version from public.stock_movements where product_id=$1 order by product_version desc limit 1',[product])).rows[0];
+    assert.ok(archived.deleted_at && archived.stock === last.new_stock && Number(archived.version) === Number(last.product_version),'Eliminar y stock conservan el último movimiento sin desajustes');
     console.log('Concurrencia: incrementos, reintentos, casilla y decrementos correctos con hasta cinco sesiones.');
     console.log('Concurrencia de riesgo: conflicto de versiones y reintento correctos, sin alterar stock.');
+    console.log('Concurrencia de eliminación: baja y actualización de stock conservan integridad.');
   } finally {
     if (created) {
       const cleanup = await pool.connect();

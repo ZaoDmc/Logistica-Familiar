@@ -237,3 +237,12 @@ textarea { font: inherit; width: 100%; min-width: 0; padding: 12px; border: 1px 
 .restock-filters button[aria-pressed='true'] { background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
 .restock-product > p { margin: 6px 0 8px; }
 @media (max-width: 600px) { .household-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.product-heading .purchase-quantity { color: var(--text); font-size: .9rem; margin-top: 6px; }
+.product-heading .purchase-quantity strong { color: var(--brand); }
+.product-delete { display: block; margin: 0 auto; }
+.product-remove-confirm { border: 1px solid var(--error); border-radius: 14px; background: var(--error-bg); padding: 16px; margin-top: 14px; }
+.product-remove-confirm h4 { margin: 0 0 10px; font-size: 1rem; overflow-wrap: anywhere; }
+.product-remove-confirm p { color: var(--text); font-size: .85rem; margin-bottom: 16px; }
+.product-remove-confirm .button-row { gap: 10px; }
+.danger-button { background: var(--error); color: var(--bg); }

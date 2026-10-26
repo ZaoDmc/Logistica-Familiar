@@ -167,3 +167,9 @@ El amarillo se reserva para **Por agotarse** (stock positivo igual o menor al l�
 | Contraste texto rojo / fondo | 6,44:1 | 7,82:1 |
 
 Los contadores de Reposición usan dos columnas con gap de 12 px, padding 18 × 14 px y radio de 18 px. La etiqueta de estado de cada producto usa el mismo esquema y borde de 1 px. Las tarjetas mantienen altura automática, controles de stock de 48 px y edición de límite plegable. La navegación del hogar usa cuatro columnas en escritorio y dos columnas hasta 600 px para mantener los nombres legibles. Evitar mostrar información técnica de versiones al usuario: los mensajes deben pedir revisar el valor actual.
+
+## Compra mínima y eliminación de productos
+
+Reposición muestra **Hay que comprar: N** inmediatamente debajo del nombre, con tamaño de 0,9rem, texto principal y cifra en terracota. No sustituye la etiqueta Por agotarse/Por comprar ni se muestra como una cantidad ya comprada. El número se recalcula con stock y límite confirmados.
+
+En las categorías, **Eliminar producto** es una acción de texto roja con área táctil mínima de 44 px. Abre confirmación dentro de la tarjeta, con fondo de error, borde rojo de 1 px, radio 14 px y padding 16 px. El nombre admite varias líneas. Cancelar recibe el foco inicial; confirmar usa fondo rojo y texto del color de fondo general. Los botones se separan 10 px y pueden saltar de línea. Los controles de cantidad y riesgo quedan bloqueados mientras la confirmación está abierta.

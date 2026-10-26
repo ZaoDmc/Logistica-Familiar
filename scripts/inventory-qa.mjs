@@ -20,9 +20,11 @@ try {
         ['Alimentos','dairy','Crema de leche Soprole','Envases de 200 ml',2],
         ['Mascotas','pet','Comida del Logan Cannes','Bolsas de alimento',1],
         ['Aseo','paper','Papel higiénico','Paquetes de doce rollos',0],
+        ['Alimentos','food','Huevos','Unidades',4],
       ]) {
-        const result=await client.from('categories').insert({household_id:fixture.home,name:category,icon_id:icon}).select('id').single(); if(result.error)throw result.error;
-        const product=await client.rpc('create_product_with_risk',{p_household_id:fixture.home,p_category_id:result.data.id,p_name:name,p_description:description,p_icon_id:icon,p_initial_stock:stock,p_operation_id:randomUUID(),p_risk_quantity:category === 'Alimentos' ? 2 : 0}); if(product.error)throw product.error;
+        let result=await client.from('categories').select('id').eq('household_id',fixture.home).eq('name',category).maybeSingle(); if(result.error)throw result.error;
+        if (!result.data) result=await client.from('categories').insert({household_id:fixture.home,name:category,icon_id:icon}).select('id').single(); if(result.error)throw result.error;
+        const product=await client.rpc('create_product_with_risk',{p_household_id:fixture.home,p_category_id:result.data.id,p_name:name,p_description:description,p_icon_id:icon,p_initial_stock:stock,p_operation_id:randomUUID(),p_risk_quantity:name === 'Huevos' ? 12 : category === 'Alimentos' ? 2 : 0}); if(product.error)throw product.error;
       }
       console.log('Hogar de prueba visual preparado. Credenciales temporales en .inventory-qa.local, excluido de Git.');
     } catch(error) { await cleanupInventoryFixture(admin,pool,fixture); unlinkSync(file); throw error; }

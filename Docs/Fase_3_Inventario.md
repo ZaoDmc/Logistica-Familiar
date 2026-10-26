@@ -110,7 +110,7 @@ Para una revisión visual aislada, `npm.cmd run inventory:qa` prepara hogares y 
 
 ## Pendientes de las siguientes fases
 
-Fase 4: recibir cambios automáticamente entre dispositivos, recuperar estado al volver a la aplicación y probar cortes reales de red. Fase 5: publicación HTTPS y PWA instalable. La edición de categorías y el borrado de productos, las notificaciones push continúan fuera de este alcance. La cantidad en riesgo configurable se añadió el 25 de octubre de 2026. Quitar categorías se añadió en la mejora del 23 de octubre de 2026, descrita abajo.
+Fase 4: recibir cambios automáticamente entre dispositivos, recuperar estado al volver a la aplicación y probar cortes reales de red. Fase 5: publicación HTTPS y PWA instalable. La edición de categorías y las notificaciones push continúan fuera de este alcance. La eliminación de productos se añadió el 26 de octubre de 2026. La cantidad en riesgo configurable se añadió el 25 de octubre de 2026. Quitar categorías se añadió en la mejora del 23 de octubre de 2026, descrita abajo.
 
 ## Mejora del 23 de octubre de 2026: quitar categorías
 
@@ -139,3 +139,17 @@ Se comparte una instancia de inventario entre los apartados: operaciones pendien
 La migración `202610250001_stock_risk.sql` agrega `risk_quantity` y `risk_version`, además de `create_product_with_risk` y `set_product_risk`. Aplicarla con `npm.cmd run db:migrate` antes de publicar. La creación guarda stock, límite y movimiento inicial atómicamente. El RPC anterior sigue disponible para clientes antiguos y operaciones pendientes, con límite 0. El navegador sigue sin permisos de UPDATE directo.
 
 Validación: 23 pruebas nuevas SQL locales/remotas; 128 pruebas SQL en total. Los cambios simultáneos del límite detectan conflictos y conservan stock/historial. Modelo: 40 comprobaciones; sincronización: 22; PWA: 44. Prueba móvil como integrante temporal: alta de 10 bolsas con riesgo 2, stock 2 amarillo, edición de riesgo a 3 desde Reposición, stock 0 rojo, suma a 1 amarillo y reposición a 4 retirando la tarjeta. Las pruebas físicas en teléfonos familiares siguen pendientes.
+
+## Mejora del 26 de octubre de 2026: eliminar productos y compra mínima
+
+En Productos, dentro de cada categoría, admin e integrantes pueden elegir **Eliminar producto**. Se pide confirmación con el nombre del artículo y el foco inicial queda en Cancelar. Si hay una cantidad sin guardar, primero hay que resolverla. Confirmar lo retira de Productos, contadores y Reposición para todo el hogar; no pone artificialmente el stock en cero.
+
+La eliminación es lógica: `deleted_at` y `deleted_by` registran la baja, se conserva la fila y todos sus movimientos y se desvincula de la categoría. Así se puede quitar después una categoría que ya quedó vacía. La consulta de inventario filtra `deleted_at IS NULL`; el historial sigue mostrando los movimientos anteriores. Los registros retirados siguen sujetos a la separación por hogar y pueden consultarse por la API autorizada para auditoría, aunque no aparecen en las listas activas. No se agregó una función de restauración.
+
+La migración `202610260001_remove_product.sql` agrega `remove_product`, limitado a integrantes del hogar, y un trigger que impide modificar productos ya eliminados, incluso desde los RPC anteriores de stock o riesgo. La baja bloquea la fila y es segura ante reintentos y cambios de stock simultáneos. No concede DELETE directo al cliente ni borra movimientos.
+
+En Reposición, cada tarjeta incorpora el subtítulo **Hay que comprar: N**, con `N = max(0, cantidad_en_riesgo + 1 - stock)`. Es la cantidad necesaria para superar el umbral, no solo igualarlo. Con 4 huevos y riesgo 12, N es 9 y el stock final sería 13. Con stock 0 y riesgo 0, N es 1. Se recalcula con valores confirmados por el servidor, sin cambiar automáticamente el inventario. Si el riesgo ya está en el máximo admitido (1.000.000), se avisa que debe reducirse para poder registrar Disponible.
+
+Validación: 19 pruebas nuevas SQL locales y remotas (147 en total), aislamiento, historial, reintentos y categoría vacía tras la baja; concurrencia de eliminación con stock; 50 comprobaciones del modelo, 22 de sincronización y 44 PWA. Realtime: 17 comprobaciones con cinco sesiones, incluida la desaparición del producto activo conservando sus nueve movimientos de prueba. Navegador a 360 px, claro/oscuro: confirmación y cancelación; huevos 4/12 muestran 9, subir a 5 muestra 8 y llegar a 13 retira la tarjeta de Reposición. No se modificaron los hogares reales.
+
+Aplicar la migración antes de publicar y recargar desde el aviso de nueva versión. Los clientes anteriores deben actualizarse para excluir correctamente los registros retirados de sus listas; el servidor ya impide escribir en ellos.
