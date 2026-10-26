@@ -19,3 +19,5 @@ La consulta activa filtra productos retirados y mantiene el aislamiento por hoga
 - Migración aplicada sin eliminar datos de las familias reales. Pruebas con hogares sintéticos y limpieza al finalizar. Las pruebas físicas en teléfonos familiares siguen pendientes.
 
 Guías de fases 3/4, diseño visual, plan y README actualizados.
+
+Publicación verificada el 26 de octubre de 2026: https://logistica-familiar.vercel.app/ en estado READY, con 55 comprobaciones HTTPS correctas. Datos y cuentas temporales eliminados. Rama: codex/eliminar-productos-reposicion. Commit de implementación: 3c6dfb7.
